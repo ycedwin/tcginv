@@ -77,21 +77,16 @@ assertEqual(soldFortyFive.quantity, 1, "different sold price is own lot");
 assertEqual(lots.filter(function (card) { return card.id === "OP17-063"; })[0].status, "sold", "sold without price");
 
 assertDeepEqual(
-  OPShelf.imageCandidates({ id: "OP06-065", set: "OP06", alternate: "Jolly Roger · Alt", jollyRoger: true, parallel: true, thumbnail: "" }),
+  OPShelf.imageCandidates({ id: "OP06-065", set: "OP06", alternate: "Jolly Roger", jollyRoger: true, parallel: false, thumbnail: "" }),
   [
     "thumbs/OP06-065.webp",
     "thumbs/OP06-065.png",
     "thumbs/OP06-065.jpg",
-    "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_p1_JP.webp",
-    "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_p2_JP.webp",
-    "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_p3_JP.webp",
+    "https://www.cardrush-op.jp/data/cardrush-op/product/PRB01-02_64.jpg",
     "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_JP.webp",
-    "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065_p1.png",
-    "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065_p2.png",
-    "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065_p3.png",
     "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065.png",
   ],
-  "jr plus parallel tries p1-p3"
+  "jr uses cardrush"
 );
 
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');

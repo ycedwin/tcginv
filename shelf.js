@@ -3,6 +3,13 @@ const OPShelf = (() => {
   const SHEET_GID = "0";
   const SHEET_EDIT = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=${SHEET_GID}#gid=${SHEET_GID}`;
   const IMAGE_CDN = "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece";
+  const CARDRUSH_IMG = "https://www.cardrush-op.jp/data/cardrush-op/product";
+  // ponytail: CardRush product IDs are not derived from card number.
+  const JR_THUMBS = {
+    "OP03-121": `${CARDRUSH_IMG}/PRB01-02_141.jpg`,
+    "OP06-064": `${CARDRUSH_IMG}/PRB01-02_66.jpg`,
+    "OP06-065": `${CARDRUSH_IMG}/PRB01-02_64.jpg`,
+  };
   const RARITY_LABELS = {
     l: "Leader",
     sr: "Super Rare",
@@ -54,28 +61,20 @@ const OPShelf = (() => {
     return parseParallel(value).label;
   }
 
-  function officialArt(id, extra) {
-    const file = extra ? `${id}_${extra}.png` : `${id}.png`;
-    return `https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${file}`)}`;
-  }
-
-  function variantSuffixes(card) {
-    const jr = card.jollyRoger || /jolly\s*roger|\bjr\b/i.test(card.alternate || "");
-    const para = card.parallel || (!!card.alternate && !jr);
-    if (jr) return ["p1", "p2", "p3"];
-    if (para) return ["p1", "p2"];
-    return [];
+  function officialArt(id) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${id}.png`)}`;
   }
 
   function imageCandidates(card) {
     const urls = [];
     if (card.thumbnail) urls.push(card.thumbnail);
     urls.push(`thumbs/${card.id}.webp`, `thumbs/${card.id}.png`, `thumbs/${card.id}.jpg`);
+    const jr = card.jollyRoger || /jolly\s*roger|\bjr\b/i.test(card.alternate || "");
+    const para = card.parallel || (!!card.alternate && !jr);
+    if (jr && JR_THUMBS[card.id]) urls.push(JR_THUMBS[card.id]);
     const base = `${IMAGE_CDN}/${card.set}/${card.id}`;
-    const extras = variantSuffixes(card);
-    for (const extra of extras) urls.push(`${base}_${extra}_JP.webp`);
+    if (para) urls.push(`${base}_p1_JP.webp`);
     urls.push(`${base}_JP.webp`);
-    for (const extra of extras) urls.push(officialArt(card.id, extra));
     urls.push(officialArt(card.id));
     return [...new Set(urls)];
   }
