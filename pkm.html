@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Card inventory</title>
+  <title>PKM inventory</title>
   <style>
     :root {
       --ink: #e8eef2;
@@ -96,6 +96,16 @@
       height: 2.5rem;
       width: auto;
       max-width: min(100%, 11rem);
+    }
+
+    .brand-word {
+      margin: 0;
+      color: #ffcb05;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
     }
 
     .game-nav {
@@ -346,6 +356,16 @@
     .badge.uc { background: rgb(46 204 113 / 78%); color: #0e1418; }
     .badge.c { background: rgb(139 148 158 / 78%); color: #0e1418; }
     .badge.p { background: rgb(255 122 69 / 78%); color: #1a140c; }
+    .badge.u { background: rgb(46 204 113 / 78%); color: #0e1418; }
+    .badge.rr { background: rgb(230 184 77 / 78%); color: #1a140c; }
+    .badge.rrr { background: rgb(212 160 48 / 88%); color: #1a140c; }
+    .badge.ar { background: rgb(232 121 180 / 82%); color: #1a140c; }
+    .badge.sar { background: rgb(180 120 255 / 82%); color: #fff; }
+    .badge.ur { background: rgb(220 80 80 / 82%); color: #fff; }
+    .badge.hr { background: rgb(192 197 204 / 82%); color: #1a140c; }
+    .badge.chr { background: rgb(90 180 190 / 82%); color: #0e1418; }
+    .badge.csr { background: rgb(90 180 190 / 82%); color: #0e1418; }
+    .badge.k { background: rgb(70 90 140 / 82%); color: #fff; }
     .badge.qty {
       left: auto;
       right: .55rem;
@@ -509,11 +529,11 @@
 
   <main>
     <div class="brand">
-      <img class="brand-logo" src="one-piece-logo.png" alt="ONE PIECE" width="820" height="280">
+      <p class="brand-word">Pokémon</p>
     </div>
     <nav class="game-nav" aria-label="Game">
-      <a href="index.html" aria-current="page">OP</a>
-      <a href="pkm.html">PKM</a>
+      <a href="index.html">OP</a>
+      <a href="pkm.html" aria-current="page">PKM</a>
     </nav>
     <div class="toolbar">
       <div class="search-wrap">
@@ -537,7 +557,7 @@
           </svg>
         </button>
       </div>
-      <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0" target="_blank" rel="noopener" title="Edit sheet" aria-label="Edit sheet">
+      <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=1049461967#gid=1049461967" target="_blank" rel="noopener" title="Edit sheet" aria-label="Edit sheet">
         <img src="google-g.png" alt="" width="96" height="96">
       </a>
     </div>
@@ -565,7 +585,7 @@
 
   <footer>
     <p id="footer-meta">Catalog updating…</p>
-    <p>Personal inventory. Official JP digital images include Bandai’s SAMPLE mark. Drop your own photos in thumbs/ to replace them. Not affiliated with Bandai or the One Piece Card Game.</p>
+    <p>Personal inventory. Card art from TCGdex and Pokémon Card Game official images. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
   </footer>
 
   <script src="shelf.js"></script>
@@ -586,8 +606,8 @@
     let sortDir = "asc";
     let sortMode = "added";
     // ponytail: bump THUMB_VER when thumbnails need a refresh.
-    const THUMB_VER = "3";
-    const THUMB_STORE = "tcginv-thumbs-" + THUMB_VER;
+    const THUMB_VER = "1";
+    const THUMB_STORE = "tcginv-pkm-thumbs-" + THUMB_VER;
     const thumbMem = new Map();
 
     function thumbKey(card) {
@@ -620,7 +640,7 @@
 
     function loadSheetJsonp() {
       return new Promise((resolve, reject) => {
-        const name = "optcgShelf_" + Date.now();
+        const name = "pkmShelf_" + Date.now();
         const script = document.createElement("script");
         const timer = setTimeout(() => finish(new Error("Sheet timed out")), 12000);
 
@@ -629,20 +649,20 @@
           delete window[name];
           script.remove();
           if (error) reject(error);
-          else resolve(OPShelf.rowsFromGviz(json));
+          else resolve(PkmShelf.rowsFromGviz(json));
         }
 
         window[name] = (json) => finish(null, json);
-        script.src = `https://docs.google.com/spreadsheets/d/${OPShelf.SHEET_ID}/gviz/tq?gid=${OPShelf.SHEET_GID}&tqx=responseHandler:${name}&t=${Date.now()}`;
+        script.src = `https://docs.google.com/spreadsheets/d/${PkmShelf.SHEET_ID}/gviz/tq?gid=${PkmShelf.SHEET_GID}&tqx=responseHandler:${name}&t=${Date.now()}`;
         script.onerror = () => finish(new Error("Could not reach Google Sheets"));
         document.head.append(script);
       });
     }
 
     async function loadCsvFallback() {
-      const response = await fetch(`cards.csv?v=${Date.now()}`);
+      const response = await fetch(`pkm.csv?v=${Date.now()}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return OPShelf.parseCsv(await response.text());
+      return PkmShelf.parseCsv(await response.text());
     }
 
     function renderChipNav(container, options, selected, onSelect) {
@@ -662,7 +682,7 @@
     function visibleCards() {
       const query = search.value.trim().toLowerCase();
       const visible = cards.filter((card) => {
-        const blob = `${card.id} ${card.raw} ${card.set} ${card.rarity} ${OPShelf.rarityLabel(card.rarity)} ${card.alternate} ${card.condition} ${card.cost} ${card.soldPrice ?? ""}`.toLowerCase();
+        const blob = `${card.id} ${card.raw} ${card.set} ${card.number} ${card.localId} ${card.rarity} ${PkmShelf.rarityLabel(card.rarity)} ${card.condition} ${card.cost} ${card.soldPrice ?? ""}`.toLowerCase();
         const matchesQuery = !query || blob.includes(query);
         const matchesRarity = rarityFilter === "all" || card.rarityKey === rarityFilter;
         const matchesStatus = statusFilter === "all"
@@ -679,7 +699,7 @@
     }
 
     function bindImageFallbacks(image, card) {
-      const urls = OPShelf.imageCandidates(card);
+      const urls = PkmShelf.imageCandidates(card);
       const known = knownThumb(card);
       const list = known ? [known, ...urls.filter((url) => url !== known)] : urls;
       let index = 0;
@@ -713,7 +733,7 @@
       head.append(name);
       const sku = document.createElement("p");
       sku.className = "sku";
-      sku.textContent = card.alternate || "\u00a0";
+      sku.textContent = "\u00a0";
       head.append(sku);
 
       const imageWrap = document.createElement("div");
@@ -723,13 +743,16 @@
       image.referrerPolicy = "no-referrer";
       bindImageFallbacks(image, card);
 
-      const rarity = document.createElement("span");
-      rarity.className = `badge ${card.rarityKey}`;
-      rarity.textContent = OPShelf.rarityLabel(card.rarity);
       const qty = document.createElement("span");
       qty.className = "badge qty";
       qty.textContent = String(card.quantity);
-      imageWrap.append(image, rarity, qty);
+      imageWrap.append(image, qty);
+      if (card.rarity) {
+        const rarity = document.createElement("span");
+        rarity.className = `badge ${card.rarityKey}`;
+        rarity.textContent = PkmShelf.rarityLabel(card.rarity);
+        imageWrap.append(rarity);
+      }
       if (card.condition) {
         const cond = document.createElement("span");
         cond.className = `badge condition condition-${card.condition.toLowerCase()}`;
@@ -746,8 +769,8 @@
       const prices = document.createElement("div");
       prices.className = "prices";
       for (const [label, value] of [
-        ["Cost", OPShelf.formatPrice(card.cost)],
-        ["Sold", card.sold ? OPShelf.formatPrice(card.soldPrice) : "—"],
+        ["Cost", PkmShelf.formatPrice(card.cost)],
+        ["Sold", card.sold ? PkmShelf.formatPrice(card.soldPrice) : "—"],
       ]) {
         const box = document.createElement("div");
         box.className = "price-box";
@@ -792,10 +815,10 @@
       const statusOptions = [["all", "All status"], ["in-stock", "In stock"], ["sold", "Sold"]];
       renderChipNav(statusNav, statusOptions, statusFilter, (value) => { statusFilter = value; render(); });
 
-      const rarities = OPShelf.RARITY_ORDER.filter((key) => cards.some((card) => card.rarityKey === key));
+      const rarities = PkmShelf.RARITY_ORDER.filter((key) => cards.some((card) => card.rarityKey === key));
       renderChipNav(
         rarityNav,
-        [["all", "All"], ...rarities.map((key) => [key, OPShelf.rarityLabel(key)])],
+        [["all", "All"], ...rarities.map((key) => [key, PkmShelf.rarityLabel(key)])],
         rarityFilter,
         (value) => { rarityFilter = value; render(); }
       );
@@ -815,7 +838,7 @@
 
       document.querySelector("#footer-meta").textContent = source === "sheet"
         ? "Reading the published Google Sheet on each load. Refresh after edits if Google is still caching."
-        : "Could not reach Google Sheets, showing cards.csv.";
+        : "Could not reach Google Sheets, showing pkm.csv.";
       sortButton.dataset.dir = sortMode === "id" ? sortDir : "added";
       sortButton.title = sortMode === "added" ? "Newest in the sheet first" : "Sort by card number";
       sortButton.setAttribute("aria-label", sortButton.title);
@@ -833,16 +856,16 @@
       refresh.classList.add("is-busy");
       try {
         const rows = await loadSheetJsonp();
-        cards = OPShelf.groupRows(rows);
+        cards = PkmShelf.groupRows(rows);
         source = "sheet";
       } catch (error) {
         console.error(error);
         try {
-          cards = OPShelf.groupRows(await loadCsvFallback());
+          cards = PkmShelf.groupRows(await loadCsvFallback());
           source = "csv";
         } catch (fallbackError) {
           console.error(fallbackError);
-          catalog.innerHTML = '<p class="error">Could not load the Google Sheet or backup cards.csv.</p>';
+          catalog.innerHTML = '<p class="error">Could not load the Google Sheet or backup pkm.csv.</p>';
           refresh.disabled = false;
           refresh.classList.remove("is-busy");
           return;

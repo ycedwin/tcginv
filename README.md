@@ -1,12 +1,14 @@
 # TCG inventory
 
-Personal One Piece Card Game shelf. Edit stock in Google Sheets; the site reads it on every load.
+Personal One Piece and Pokémon shelves. Edit stock in Google Sheets; the site reads it on every load.
 
 | | URL |
 | --- | --- |
 | Live site | https://ycedwin.github.io/tcginv/ |
+| Pokémon | https://ycedwin.github.io/tcginv/pkm.html |
 | Repo | https://github.com/ycedwin/tcginv |
-| Edit sheet | https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0 |
+| OP sheet | https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0 |
+| PKM sheet | https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=1049461967#gid=1049461967 |
 
 ## Sheet columns
 
@@ -21,6 +23,21 @@ Personal One Piece Card Game shelf. Edit stock in Google Sheets; the site reads 
 | Thumbnail url | optional. Overrides the auto JP image |
 
 Each row is one copy. Same card + same cost + same sold price + same condition stacks as qty. Different cost, sold price, or condition stays a separate lot.
+
+## PKM tab
+
+Same spreadsheet, tab **PKM**. Page: [pkm.html](https://ycedwin.github.io/tcginv/pkm.html).
+
+| Column | What it does |
+| --- | --- |
+| Set | JP set code: `sv3`, `s10b`, `sv4a`. `promo` = SV-P |
+| Card number | `066/108` or `291/sv-p` |
+| Rarity | `C` / `R` / `RR` / `RRR` / `AR` / `SR` / `CHR` / … — blank = no tag |
+| Cost(Yen) | what you paid. Empty or `0` shows as — |
+| Condition | blank = no tag. `A` / `B` / `C` / `D` |
+| Sold | empty = in stock. A number = sold at that price |
+
+Images come from [TCGdex](https://tcgdex.dev) JP art. Odd sets without a TCGdex file (and anything you want to override) can use `thumbs/pkm/SV3-066.jpg`.
 
 Newest sheet rows show first. The sort button cycles newest-first → card number A–Z → Z–A.
 

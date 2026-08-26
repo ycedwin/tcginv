@@ -252,13 +252,212 @@ const OPShelf = (() => {
     imageCandidates,
     parseCondition,
     parseSold,
+    pickSold,
     isSold,
     formatPrice,
     groupRows,
+    pick,
+    parseNumber,
     parseGvizText,
     rowsFromGviz,
     parseCsv,
   };
 })();
 
-if (typeof module !== "undefined" && module.exports) module.exports = OPShelf;
+const PkmShelf = (() => {
+  const SHEET_ID = OPShelf.SHEET_ID;
+  const SHEET_GID = "1049461967";
+  const SHEET_EDIT = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=${SHEET_GID}#gid=${SHEET_GID}`;
+  const RARITY_ORDER = ["c", "u", "r", "rr", "rrr", "ar", "sr", "sar", "ur", "hr", "chr", "csr", "k"];
+  const OFFICIAL_HOST = "https://www.pokemon-card.com";
+  // ponytail: official filenames include an internal id, so this map is hand-resolved.
+  const OFFICIAL = {
+    "sv3|066/108": "/assets/images/card_images/large/SV3/043908_P_RIZADONEX.jpg",
+    "s9|014/100": "/assets/images/card_images/large/S9/040916_P_RIZADONV.jpg",
+    "m2|013/080": "/assets/images/card_images/large/M2/048353_P_MRIZADONXEX.jpg",
+    "svk|001/044": "/assets/images/card_images/large/SVK/046072_P_KAGAYAKURIZADON.jpg",
+    "sv4a|115/190": "/assets/images/card_images/large/SV4a/044638_P_RIZADONEX.jpg",
+    "s8b|017/184": "/assets/images/card_images/large/S8b/040169_P_RIZADON.jpg",
+    "s12a|013/172": "/assets/images/card_images/large/S12a/042274_P_RIZADONV.jpg",
+    "s12a|014/172": "/assets/images/card_images/large/S12a/042275_P_RIZADONVSTAR.jpg",
+    "sv5m|023/071": "/assets/images/card_images/large/SV5M/045240_P_PIKACHIXYUU.jpg",
+    "sv4a|055/190": "/assets/images/card_images/large/SV4a/044578_P_PIKACHIXYUU.jpg",
+    "sv2d|017/071": "/assets/images/card_images/large/SV2D/043153_P_PIKACHIXYUU.jpg",
+    "s10a|014/071": "/assets/images/card_images/large/S10a/041533_P_PIKACHIXYUU.jpg",
+    "mc|227/742": "/assets/images/card_images/large/MC/048943_P_PIKACHIXYUUEX.jpg",
+    "sv2a|025/165": "/assets/images/card_images/large/SV2a/043346_P_PIKACHIXYUU.jpg",
+    "s8b|045/184": "/assets/images/card_images/large/S8b/040197_P_PIKACHIXYUUV.jpg",
+    "sm10a|009/054": "/assets/images/card_images/large/SM10a/036549_P_PIKACHUU.jpg",
+    "sv8|033/106": "/assets/images/card_images/large/SV8/046373_P_PIKACHIXYUUEX.jpg",
+    "s10a|023/071": "/assets/images/card_images/large/S10a/041542_P_GENGA.jpg",
+    "m1l|065/063": "/assets/images/card_images/large/M1L/048422_P_FUSHIGISOU.jpg",
+    "sv2a|184/165": "/assets/images/card_images/large/SV2a/043969_P_FUSHIGIBANAEX.jpg",
+    "sv2a|166/165": "/assets/images/card_images/large/SV2a/043951_P_FUSHIGIDANE.jpg",
+    "m1l|064/063": "/assets/images/card_images/large/M1L/048421_P_FUSHIGIDANE.jpg",
+    "m1l|076/063": "/assets/images/card_images/large/M1L/048433_P_MFUSHIGIBANAEX.jpg",
+    "s12a|054/172": "/assets/images/card_images/large/S12a/042315_P_MIXYUUVMAX.jpg",
+    "s11|080/100": "/assets/images/card_images/large/S11/041884_P_GIRATEINAV.jpg",
+    "s8b|101/184": "/assets/images/card_images/large/S8b/040250_P_BURAKKIVMAX.jpg",
+    "m2a|210/193": "/assets/images/card_images/large/M2a/049970_P_NNOZEKUROMU.jpg",
+    "m5|087/081": "/assets/images/card_images/large/M5/050307_P_YADORAN.jpg",
+    "sv11b|161/086": "/assets/images/card_images/large/SV11B/047985_P_ZEKUROMUEX.jpg",
+    "sv3a|071/062": "/assets/images/card_images/large/SV3a/044387_P_IBERUTARU.jpg",
+    "s8|115/100": "/assets/images/card_images/large/S8/040113_T_PODDOTODENTOTOKON.jpg",
+    "m3|107/080": "/assets/images/card_images/large/M3/050074_T_MEINOHAGEMASHI.jpg",
+    "s8b|261/184": "/assets/images/card_images/large/S8b/041089_T_SAITOU.jpg",
+    "mc|443/742": "/assets/images/card_images/large/MC/049159_P_GOSUTO.jpg",
+    "sv4a|173/190": "/assets/images/card_images/large/SV4a/044696_T_SAKAKINOKARISUMA.jpg",
+    "svjl|006/021": "/assets/images/card_images/large/SVJL/045806_P_RIZADONEX.jpg",
+  };
+
+  function canonicalSet(raw) {
+    const text = String(raw || "").trim();
+    if (!text) return "";
+    if (/^promo$/i.test(text)) return "SV-P";
+    const match = text.match(/^([a-z]+)(\d*)([a-z]*)$/i);
+    if (!match) return text.toUpperCase();
+    const prefix = match[1].toUpperCase();
+    const digits = match[2];
+    let suffix = match[3];
+    if (suffix.length === 1 && /[ab]/i.test(suffix)) suffix = suffix.toLowerCase();
+    else suffix = suffix.toUpperCase();
+    return prefix + digits + suffix;
+  }
+
+  function setVariants(setId) {
+    const text = String(setId || "").trim();
+    if (!text) return [];
+    const match = text.match(/^([a-z]+)(\d*)([a-z]*)$/i);
+    if (!match) return [...new Set([text, text.toUpperCase()])];
+    const prefix = match[1].toUpperCase();
+    const digits = match[2];
+    const suffix = match[3];
+    return [...new Set([
+      text,
+      prefix + digits + suffix,
+      prefix + digits + suffix.toUpperCase(),
+      prefix + digits + suffix.toLowerCase(),
+      text.toUpperCase(),
+    ])].filter(Boolean);
+  }
+
+  function seriesOf(setId) {
+    const upper = String(setId || "").toUpperCase();
+    if (upper.startsWith("SV")) return "SV";
+    if (upper.startsWith("SM")) return "SM";
+    if (upper.startsWith("S")) return "S";
+    if (upper.startsWith("M")) return "M";
+    return upper.slice(0, 2) || "SV";
+  }
+
+  function parseCollector(raw) {
+    const text = String(raw || "").trim();
+    if (!text) return { localId: "", number: "", raw: "" };
+    const promo = text.match(/^(\d+)\s*\/\s*sv-?p$/i);
+    if (promo) {
+      const localId = promo[1].padStart(3, "0");
+      return { localId, number: `${localId}/SV-P`, raw: text };
+    }
+    const split = text.match(/^(\d+)\s*\/\s*(.+)$/);
+    if (split) {
+      const localId = split[1].padStart(3, "0");
+      return { localId, number: `${localId}/${split[2]}`, raw: text };
+    }
+    const digits = text.match(/^(\d+)$/);
+    if (digits) {
+      const localId = digits[1].padStart(3, "0");
+      return { localId, number: localId, raw: text };
+    }
+    return { localId: text.toUpperCase(), number: text, raw: text };
+  }
+
+  function rarityLabel(rarity) {
+    return String(rarity || "").trim().toUpperCase();
+  }
+
+  function imageCandidates(card) {
+    const urls = [];
+    if (card.thumbnail) urls.push(card.thumbnail);
+    const stem = `${card.set}-${card.localId}`;
+    urls.push(`thumbs/pkm/${stem}.webp`, `thumbs/pkm/${stem}.jpg`);
+    const officialPath = OFFICIAL[`${String(card.set).toLowerCase()}|${String(card.number).toLowerCase()}`]
+      || OFFICIAL[`${String(card.set).toLowerCase()}|${String(card.raw).toLowerCase()}`];
+    if (officialPath) urls.push(OFFICIAL_HOST + officialPath);
+    for (const setId of setVariants(card.set)) {
+      const series = seriesOf(setId);
+      urls.push(`https://assets.tcgdex.net/ja/${series}/${setId}/${card.localId}/high.webp`);
+    }
+    return [...new Set(urls)];
+  }
+
+  function groupRows(rows) {
+    const map = new Map();
+    rows.forEach((row, index) => {
+      const numberRaw = String(OPShelf.pick(row, "Card number", "card_number") || "").trim();
+      const setRaw = String(OPShelf.pick(row, "Set", "Expansion", "パック") || "").trim();
+      if (!numberRaw && !setRaw) return;
+      const set = canonicalSet(setRaw);
+      const parsed = parseCollector(numberRaw);
+      if (!parsed.localId) return;
+      const rarity = String(OPShelf.pick(row, "Rarity") || "").trim();
+      const condition = OPShelf.parseCondition(OPShelf.pick(row, "Condition", "Cond", "状態"));
+      const thumbnail = String(OPShelf.pick(row, "Thumbnail url", "thumbnail_url") || "").trim();
+      const cost = OPShelf.parseNumber(OPShelf.pick(row, "Cost(Yen)", "Cost (Yen)", "Cost", "円")) || 0;
+      const soldInfo = OPShelf.parseSold(OPShelf.pickSold(row));
+      const id = `${set} ${parsed.number}`.trim();
+      const key = [id, rarity.toLowerCase(), condition, cost, soldInfo.sold ? (soldInfo.price ?? "sold") : "open"].join("|");
+      const existing = map.get(key);
+      if (existing) {
+        existing.quantity += 1;
+        existing.added = index;
+        if (!existing.thumbnail && thumbnail) existing.thumbnail = thumbnail;
+        return;
+      }
+      map.set(key, {
+        id,
+        set,
+        localId: parsed.localId,
+        number: parsed.number,
+        raw: parsed.raw || numberRaw,
+        rarity,
+        rarityKey: rarity.toLowerCase(),
+        alternate: "",
+        condition,
+        cost,
+        soldPrice: soldInfo.price,
+        thumbnail,
+        quantity: 1,
+        sold: soldInfo.sold,
+        added: index,
+      });
+    });
+    return [...map.values()].map((card) => {
+      card.remaining = card.sold ? 0 : card.quantity;
+      card.status = card.sold ? "sold" : "in-stock";
+      return card;
+    });
+  }
+
+  return {
+    SHEET_ID,
+    SHEET_GID,
+    SHEET_EDIT,
+    RARITY_ORDER,
+    canonicalSet,
+    parseCollector,
+    rarityLabel,
+    imageCandidates,
+    groupRows,
+    parseCondition: OPShelf.parseCondition,
+    parseSold: OPShelf.parseSold,
+    isSold: OPShelf.isSold,
+    formatPrice: OPShelf.formatPrice,
+    rowsFromGviz: OPShelf.rowsFromGviz,
+    parseCsv: OPShelf.parseCsv,
+  };
+})();
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = OPShelf;
+  module.exports.PkmShelf = PkmShelf;
+}

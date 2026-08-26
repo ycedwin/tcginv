@@ -100,6 +100,38 @@ assertDeepEqual(
   "jr uses cardrush"
 );
 
+assertEqual(PkmShelf.canonicalSet("sv3"), "SV3", "pkm set sv3");
+assertEqual(PkmShelf.canonicalSet("s10b"), "S10b", "pkm set s10b");
+assertEqual(PkmShelf.canonicalSet("svJL"), "SVJL", "pkm set svJL");
+assertEqual(PkmShelf.canonicalSet("promo"), "SV-P", "pkm promo set");
+assertEqual(PkmShelf.parseCollector("066/108").localId, "066", "pkm collector");
+assertEqual(PkmShelf.parseCollector("066/108").number, "066/108", "pkm number");
+assertEqual(PkmShelf.parseCollector("291/sv-p").localId, "291", "pkm promo num");
+assertEqual(PkmShelf.parseCollector("291/sv-p").number, "291/SV-P", "pkm promo display");
+
+const pkmLots = PkmShelf.groupRows([
+  { Set: "sv3", "Card number": "066/108", Rarity: "RR", "Cost(Yen)": 200 },
+  { Set: "sv3", "Card number": "066/108", Rarity: "RR", "Cost(Yen)": 200 },
+  { Set: "sv3", "Card number": "066/108", Rarity: "SR", "Cost(Yen)": 200 },
+  { Set: "s10b", "Card number": "010/071", Rarity: "R", "Cost(Yen)": 300 },
+]);
+assertEqual(pkmLots.length, 3, "pkm group count");
+assertEqual(pkmLots.filter(function (card) { return card.id === "SV3 066/108" && card.rarity === "RR"; })[0].quantity, 2, "pkm stacks");
+assertEqual(pkmLots.filter(function (card) { return card.rarity === "SR"; })[0].id, "SV3 066/108", "pkm rarity splits");
+
+assertEqual(
+  PkmShelf.imageCandidates({ set: "SV3", localId: "066", number: "066/108", thumbnail: "" })[0],
+  "thumbs/pkm/SV3-066.webp",
+  "pkm thumb first"
+);
+assertEqual(
+  PkmShelf.imageCandidates({ set: "SVJL", localId: "006", number: "006/021", thumbnail: "" }).some(function (url) {
+    return /SVJL\/045806/.test(url);
+  }),
+  true,
+  "pkm svjl official"
+);
+
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');
 assertDeepEqual(OPShelf.rowsFromGviz(gviz), [{ "Card number": "op13-004", Rarity: "l" }], "gviz rows");
 
