@@ -98,15 +98,6 @@
       max-width: min(100%, 11rem);
     }
 
-    .page-nav {
-      display: flex;
-      justify-content: center;
-      gap: .4rem;
-      margin: .35rem 0 .55rem;
-    }
-
-    a.filter-chip { text-decoration: none; }
-
     .toolbar {
       display: flex;
       align-items: center;
@@ -483,7 +474,6 @@
     <div class="brand">
       <img class="brand-logo" src="one-piece-logo.png" alt="ONE PIECE" width="820" height="280">
     </div>
-    <nav class="page-nav" id="page-nav" aria-label="Catalog"></nav>
     <div class="toolbar">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -544,8 +534,6 @@
     const rarityNav = document.querySelector("#rarity-nav");
     const rarityToggle = document.querySelector("#rarity-toggle");
     const statusNav = document.querySelector("#status-nav");
-    const pageNav = document.querySelector("#page-nav");
-    const editLink = document.querySelector("#edit-link");
     const backToTop = document.querySelector("#back-to-top");
     const refresh = document.querySelector("#refresh");
     const sortButton = document.querySelector("#sort");
@@ -555,26 +543,6 @@
     let rarityFilter = "all";
     let statusFilter = "all";
     let sortDir = "asc";
-    let page = currentPage();
-
-    function currentPage() {
-      const fromHash = location.hash.replace(/^#/, "").trim().toLowerCase();
-      const fromQuery = new URLSearchParams(location.search).get("sheet");
-      return OPShelf.pageById(fromHash || fromQuery || "op");
-    }
-
-    function renderPageNav() {
-      pageNav.replaceChildren();
-      for (const item of OPShelf.PAGES) {
-        const link = document.createElement("a");
-        link.className = "filter-chip";
-        link.href = item.id === "op" ? "#" : `#${item.id}`;
-        link.textContent = item.label;
-        link.setAttribute("aria-pressed", String(item.id === page.id));
-        pageNav.append(link);
-      }
-      editLink.href = OPShelf.editUrl(page);
-    }
 
     function loadSheetJsonp() {
       return new Promise((resolve, reject) => {
@@ -591,7 +559,7 @@
         }
 
         window[name] = (json) => finish(null, json);
-        script.src = `https://docs.google.com/spreadsheets/d/${OPShelf.SHEET_ID}/gviz/tq?${OPShelf.sheetQuery(page)}&tqx=responseHandler:${name}&t=${Date.now()}`;
+        script.src = `https://docs.google.com/spreadsheets/d/${OPShelf.SHEET_ID}/gviz/tq?gid=${OPShelf.SHEET_GID}&tqx=responseHandler:${name}&t=${Date.now()}`;
         script.onerror = () => finish(new Error("Could not reach Google Sheets"));
         document.head.append(script);
       });
@@ -672,7 +640,7 @@
       const image = document.createElement("img");
       image.loading = "lazy";
       image.referrerPolicy = "no-referrer";
-      bindImageFallbacks(image, OPShelf.imageCandidates(card, page.id), card.id);
+      bindImageFallbacks(image, OPShelf.imageCandidates(card), card.id);
 
       const rarity = document.createElement("span");
       rarity.className = `badge ${card.rarityKey}`;
@@ -737,11 +705,10 @@
       const statusOptions = [["all", "All status"], ["in-stock", "In stock"], ["sold", "Sold"]];
       renderChipNav(statusNav, statusOptions, statusFilter, (value) => { statusFilter = value; render(); });
 
-      const known = OPShelf.RARITY_ORDER.filter((key) => cards.some((card) => card.rarityKey === key));
-      const extra = [...new Set(cards.map((card) => card.rarityKey).filter((key) => key && !OPShelf.RARITY_ORDER.includes(key)))];
+      const rarities = OPShelf.RARITY_ORDER.filter((key) => cards.some((card) => card.rarityKey === key));
       renderChipNav(
         rarityNav,
-        [["all", "All"], ...[...known, ...extra].map((key) => [key, OPShelf.rarityLabel(key)])],
+        [["all", "All"], ...rarities.map((key) => [key, OPShelf.rarityLabel(key)])],
         rarityFilter,
         (value) => { rarityFilter = value; render(); }
       );
@@ -773,8 +740,6 @@
     }
 
     async function loadInventory() {
-      page = currentPage();
-      renderPageNav();
       refresh.disabled = true;
       refresh.classList.add("is-busy");
       try {
@@ -783,13 +748,6 @@
         source = "sheet";
       } catch (error) {
         console.error(error);
-        if (page.id !== "op") {
-          cards = [];
-          catalog.innerHTML = `<p class="error">Could not load the ${page.label} tab. Add a sheet tab named ${page.sheet} with the same columns.</p>`;
-          refresh.disabled = false;
-          refresh.classList.remove("is-busy");
-          return;
-        }
         try {
           cards = OPShelf.groupRows(await loadCsvFallback());
           source = "csv";
@@ -826,11 +784,6 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    window.addEventListener("hashchange", () => {
-      rarityFilter = "all";
-      statusFilter = "all";
-      loadInventory();
-    });
     loadInventory();
   </script>
 </body>

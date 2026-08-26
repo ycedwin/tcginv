@@ -49,30 +49,10 @@ const OPShelf = (() => {
     return String(rarity || "").toUpperCase() || "?";
   }
 
-  const PAGES = [
-    { id: "op", label: "OP", gid: "0" },
-    { id: "pkm", label: "PKM", sheet: "pkm" },
-  ];
-
-  function pageById(id) {
-    return PAGES.find((page) => page.id === id) || PAGES[0];
-  }
-
-  function sheetQuery(page) {
-    if (page.sheet) return `sheet=${encodeURIComponent(page.sheet)}`;
-    return `gid=${page.gid || "0"}`;
-  }
-
-  function editUrl(page) {
-    const gid = page.gid || "0";
-    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=${gid}#gid=${gid}`;
-  }
-
-  function imageCandidates(card, pageId) {
+  function imageCandidates(card) {
     const urls = [];
     if (card.thumbnail) urls.push(card.thumbnail);
     urls.push(`thumbs/${card.id}.webp`, `thumbs/${card.id}.png`, `thumbs/${card.id}.jpg`);
-    if (pageId === "pkm") return [...new Set(urls)];
     const base = `${IMAGE_CDN}/${card.set}/${card.id}`;
     if (card.alternate) urls.push(`${base}_p1_JP.webp`);
     urls.push(`${base}_JP.webp`);
@@ -233,10 +213,6 @@ const OPShelf = (() => {
     SHEET_ID,
     SHEET_GID,
     SHEET_EDIT,
-    PAGES,
-    pageById,
-    sheetQuery,
-    editUrl,
     RARITY_ORDER,
     normalizeCardId,
     setCode,
