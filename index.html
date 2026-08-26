@@ -89,30 +89,14 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      gap: .7rem;
       margin: 0 0 1rem;
     }
 
-    .brand-mark {
-      width: 2.6rem;
-      height: 2.6rem;
-      flex: 0 0 auto;
-    }
-
-    .brand-name {
-      color: #e31c23;
-      font-size: clamp(1.4rem, 4vw, 2rem);
-      font-style: italic;
-      font-weight: 900;
-      letter-spacing: .06em;
-      line-height: 1;
-      text-shadow:
-        -2px -2px 0 #111,
-        2px -2px 0 #111,
-        -2px 2px 0 #111,
-        2px 2px 0 #111;
-      transform: scaleY(1.12);
-      transform-origin: left center;
+    .brand-logo {
+      display: block;
+      height: 4.6rem;
+      width: auto;
+      max-width: min(100%, 18rem);
     }
 
     .toolbar {
@@ -447,6 +431,7 @@
       .toolbar-actions { justify-content: stretch; }
       .toolbar-actions .edit-link { flex: 1; }
       .banner-tag { font-size: .58rem; }
+      .brand-logo { height: 3.4rem; }
     }
   </style>
 </head>
@@ -461,17 +446,7 @@
 
   <main>
     <div class="brand">
-      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
-        <circle cx="32" cy="38" r="16" fill="#f4efe6"/>
-        <ellipse cx="32" cy="22" rx="22" ry="10" fill="#e3b23c"/>
-        <ellipse cx="32" cy="18" rx="20" ry="6" fill="#f0c85a"/>
-        <path d="M14 22c6-8 30-8 36 0" fill="none" stroke="#c48a22" stroke-width="3"/>
-        <circle cx="26" cy="38" r="3" fill="#111"/>
-        <circle cx="38" cy="38" r="3" fill="#111"/>
-        <path d="M28 46c2.4 2 5.6 2 8 0" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>
-        <path d="M18 50l-8 8M46 50l8 8M18 58l-6-8M46 58l6-8" stroke="#f4efe6" stroke-width="3" stroke-linecap="round"/>
-      </svg>
-      <span class="brand-name">ONE PIECE</span>
+      <img class="brand-logo" src="one-piece-logo.png" alt="ONE PIECE" width="813" height="280">
     </div>
     <div class="toolbar">
       <div class="search-wrap">
