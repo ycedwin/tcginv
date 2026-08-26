@@ -85,41 +85,34 @@
 
     .brand {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      margin: 0;
+      gap: .7rem 1.4rem;
+      margin: .1rem 0 .2rem;
       line-height: 0;
+    }
+
+    .brand a {
+      display: block;
+      opacity: .4;
+    }
+
+    .brand a:hover,
+    .brand a[aria-current="page"] {
+      opacity: 1;
     }
 
     .brand-logo {
       display: block;
-      height: 2.7rem;
+      height: 2.5rem;
       width: auto;
-      max-width: min(100%, 13rem);
+      max-width: min(42vw, 11rem);
     }
 
-    .game-nav {
-      display: flex;
-      justify-content: center;
-      gap: .4rem;
-      margin: .45rem 0 .1rem;
-    }
-
-    .game-nav a {
-      padding: .2rem .7rem;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-decoration: none;
-    }
-
-    .game-nav a[aria-current="page"] {
-      background: var(--green);
-      border-color: var(--green);
-      color: var(--green-ink);
+    .brand-logo.pkm {
+      height: 2.7rem;
+      max-width: min(42vw, 13rem);
     }
 
     .toolbar {
@@ -505,6 +498,7 @@
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .banner-tag { font-size: .58rem; }
       .brand-logo { height: 2.1rem; }
+      .brand-logo.pkm { height: 2.25rem; }
     }
   </style>
 </head>
@@ -518,12 +512,13 @@
   </header>
 
   <main>
-    <div class="brand">
-      <img class="brand-logo" src="pokemon-logo.svg" alt="Pokémon" width="269" height="99">
-    </div>
-    <nav class="game-nav" aria-label="Game">
-      <a href="index.html">OP</a>
-      <a href="pkm.html" aria-current="page">PKM</a>
+    <nav class="brand" aria-label="Game">
+      <a href="index.html">
+        <img class="brand-logo" src="one-piece-logo.png" alt="ONE PIECE" width="820" height="280">
+      </a>
+      <a href="pkm.html" aria-current="page">
+        <img class="brand-logo pkm" src="pokemon-logo.svg" alt="Pokémon" width="269" height="99">
+      </a>
     </nav>
     <div class="toolbar">
       <div class="search-wrap">
