@@ -309,6 +309,17 @@ const PkmShelf = (() => {
     "sv4a|173/190": "/assets/images/card_images/large/SV4a/044696_T_SAKAKINOKARISUMA.jpg",
     "svjl|006/021": "/assets/images/card_images/large/SVJL/045806_P_RIZADONEX.jpg",
   };
+  const HARERUYA_CDN = "https://www.hareruya2.com/cdn/shop/";
+  // ponytail: Hareruya filenames include a shop suffix, so this map is search-resolved.
+  const HARERUYA = {
+    "smh|032/131": "products/d032131smh-2-8156744.jpg",
+    "svd|034/139": "products/d034139svd-2-3672398.jpg",
+    "sld|007/020": "products/vd007020sld-2-1014709.jpg",
+    "sh|019/053": "products/v-019053sh-l-2-3925970.jpg",
+    "sh|014/053": "products/v-014053sh-l-2-4695600.jpg",
+    "mp1|006/023": "files/ex-006023mp1-1432706.webp",
+    "sv-p|291/sv-p": "files/promo291sv-psv-p-1726857.webp",
+  };
 
   function canonicalSet(raw) {
     const text = String(raw || "").trim();
@@ -386,6 +397,12 @@ const PkmShelf = (() => {
     for (const setId of setVariants(card.set)) {
       const series = seriesOf(setId);
       urls.push(`https://assets.tcgdex.net/ja/${series}/${setId}/${card.localId}/high.webp`);
+    }
+    const hareruyaPath = HARERUYA[`${String(card.set).toLowerCase()}|${String(card.number).toLowerCase()}`]
+      || HARERUYA[`${String(card.set).toLowerCase()}|${String(card.raw).toLowerCase()}`];
+    if (hareruyaPath) {
+      urls.push(HARERUYA_CDN + hareruyaPath);
+      urls.push(`https://wsrv.nl/?url=${encodeURIComponent("www.hareruya2.com/cdn/shop/" + hareruyaPath)}`);
     }
     return [...new Set(urls)];
   }

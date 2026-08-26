@@ -37,7 +37,7 @@ Same spreadsheet, tab **PKM**. Page: [pkm.html](https://ycedwin.github.io/tcginv
 | Condition | blank = no tag. `A` / `B` / `C` / `D` |
 | Sold | empty = in stock. A number = sold at that price |
 
-Images come from [TCGdex](https://tcgdex.dev) JP art. Odd sets without a TCGdex file (and anything you want to override) can use `thumbs/pkm/SV3-066.jpg`.
+Images come from [TCGdex](https://tcgdex.dev) JP art. If that file is missing, a few odd sets fall back to [Hareruya2](https://www.hareruya2.com/). Override anything with `thumbs/pkm/SV3-066.jpg`.
 
 Newest sheet rows show first. The sort button cycles newest-first → card number A–Z → Z–A.
 

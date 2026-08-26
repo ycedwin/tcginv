@@ -131,6 +131,20 @@ assertEqual(
   true,
   "pkm svjl official"
 );
+assertEqual(
+  PkmShelf.imageCandidates({ set: "SMH", localId: "032", number: "032/131", thumbnail: "" }).some(function (url) {
+    return /hareruya2\.com\/cdn\/shop\/products\/d032131smh/.test(url);
+  }),
+  true,
+  "pkm smh hareruya"
+);
+assertEqual(
+  PkmShelf.imageCandidates({ set: "SV-P", localId: "291", number: "291/SV-P", thumbnail: "" }).some(function (url) {
+    return /promo291sv-psv-p/.test(url);
+  }),
+  true,
+  "pkm promo hareruya"
+);
 
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');
 assertDeepEqual(OPShelf.rowsFromGviz(gviz), [{ "Card number": "op13-004", Rarity: "l" }], "gviz rows");
