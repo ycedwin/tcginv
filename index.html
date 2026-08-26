@@ -10,8 +10,6 @@
       --muted: #8b9aa3;
       --cream: #0e1418;
       --paper: #171f26;
-      --accent: #d4a574;
-      --accent-ink: #1a140c;
       --green: #2a3d36;
       --green-ink: #b7d4c4;
       --line: #2a343c;
@@ -141,26 +139,12 @@
       font-size: .82rem;
     }
 
-    input:focus, select:focus, .edit-link:focus-visible, .refresh-button:focus-visible, .sort-button:focus-visible {
+    input:focus, select:focus, .edit-link:focus-visible, .refresh-button:focus-visible, .sort-button:focus-visible, .back-to-top:focus-visible {
       outline: 3px solid rgb(212 165 116 / 45%);
       outline-offset: 2px;
     }
 
-    .edit-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 .9rem;
-      background: var(--accent);
-      border-color: var(--accent);
-      color: var(--accent-ink);
-      font-size: .75rem;
-      font-weight: 700;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .refresh-button, .sort-button {
+    .edit-link, .refresh-button, .sort-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -168,9 +152,10 @@
       min-height: 2.15rem;
       padding: 0;
       cursor: pointer;
+      text-decoration: none;
     }
 
-    .refresh-button svg, .sort-button svg {
+    .edit-link svg, .refresh-button svg, .sort-button svg {
       width: .95rem;
       height: .95rem;
     }
@@ -424,15 +409,22 @@
       right: 1.25rem;
       bottom: 1.25rem;
       z-index: 10;
-      width: 3rem;
-      height: 3rem;
-      border: 0;
+      display: grid;
+      place-items: center;
+      width: 2.6rem;
+      height: 2.6rem;
+      padding: 0;
+      border: 1px solid var(--line);
       border-radius: 50%;
-      background: var(--accent);
-      color: var(--accent-ink);
+      background: var(--paper);
+      color: var(--ink);
       box-shadow: var(--shadow);
       cursor: pointer;
-      font-size: 1.3rem;
+    }
+
+    .back-to-top svg {
+      width: 1.05rem;
+      height: 1.05rem;
     }
 
     footer {
@@ -460,7 +452,6 @@
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .toolbar { grid-template-columns: 1fr; }
       .toolbar-actions { justify-content: stretch; }
-      .toolbar-actions .edit-link { flex: 1; }
       .banner-tag { font-size: .58rem; }
       .brand-logo { height: 2.1rem; }
     }
@@ -500,7 +491,12 @@
             <path d="M21 3v6h-6"></path>
           </svg>
         </button>
-        <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0" target="_blank" rel="noopener">Edit sheet</a>
+        <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0" target="_blank" rel="noopener" title="Edit sheet" aria-label="Edit sheet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="2.5"></rect>
+            <path d="M8 8l8 8M16 8l-8 8"></path>
+          </svg>
+        </a>
       </div>
     </div>
 
@@ -519,7 +515,11 @@
     </section>
   </main>
 
-  <button class="back-to-top" id="back-to-top" type="button" hidden aria-label="Back to top">↑</button>
+  <button class="back-to-top" id="back-to-top" type="button" hidden aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M6 15l6-6 6 6"></path>
+    </svg>
+  </button>
 
   <footer>
     <p id="footer-meta">Catalog updating…</p>
