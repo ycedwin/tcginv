@@ -28,8 +28,9 @@ Keep the sheet **Anyone with the link can view**. After edits, refresh the site.
 - **designs** — unique cards
 - **in stock** — copies with Sold empty
 - **sold** — copies with a sold price
-- **Live from Google Sheets** — reading the sheet (not the backup CSV)
 - **All shown** — no search/filter hiding cards
+
+Sheet vs backup CSV is under the search bar (`Live sheet` / `Backup CSV`), not in the banner.
 
 ## Local
 

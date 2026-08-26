@@ -681,7 +681,6 @@
       document.querySelector("#banner-tags").replaceChildren(
         ...[
           `${designs} designs · ${inStock} in stock · ${sold} sold`,
-          source === "sheet" ? "Live from Google Sheets" : "Backup CSV",
           visible.length === cards.length ? "All shown" : `${visible.length} lots · ${visiblePieces} pcs`,
         ].map((label) => {
           const tag = document.createElement("span");
