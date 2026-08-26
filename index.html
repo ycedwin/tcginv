@@ -99,22 +99,20 @@
     }
 
     .toolbar {
-      display: grid;
-      grid-template-columns: minmax(13rem, 1fr) auto;
-      gap: .5rem;
+      display: flex;
       align-items: center;
+      gap: .5rem;
       margin-bottom: .75rem;
     }
 
     .toolbar-actions {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-end;
       gap: .4rem;
       align-items: center;
     }
 
-    .search-wrap { position: relative; }
+    .search-wrap { position: relative; flex: 1; min-width: 8rem; }
 
     .search-wrap svg {
       position: absolute;
@@ -154,6 +152,8 @@
       cursor: pointer;
       text-decoration: none;
     }
+
+    .edit-link { margin-left: auto; }
 
     .edit-link svg, .refresh-button svg, .sort-button svg {
       width: .95rem;
@@ -450,8 +450,6 @@
 
     @media (max-width: 610px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .toolbar { grid-template-columns: 1fr; }
-      .toolbar-actions { justify-content: stretch; }
       .banner-tag { font-size: .58rem; }
       .brand-logo { height: 2.1rem; }
     }
@@ -491,13 +489,13 @@
             <path d="M21 3v6h-6"></path>
           </svg>
         </button>
-        <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0" target="_blank" rel="noopener" title="Edit sheet" aria-label="Edit sheet">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <rect x="3.5" y="3.5" width="17" height="17" rx="2.5"></rect>
-            <path d="M8 8l8 8M16 8l-8 8"></path>
-          </svg>
-        </a>
       </div>
+      <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0" target="_blank" rel="noopener" title="Edit sheet" aria-label="Edit sheet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="17" height="17" rx="2.5"></rect>
+          <path d="M8 8l8 8M16 8l-8 8"></path>
+        </svg>
+      </a>
     </div>
 
     <div class="filter-row">
