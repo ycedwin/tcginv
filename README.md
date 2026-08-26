@@ -23,6 +23,17 @@ Each row is one copy. Same card + same cost + same sold price stacks as qty. Dif
 
 Keep the sheet **Anyone with the link can view**. After edits, refresh the site. Google can cache for a minute or two.
 
+## Pages / sheet tabs
+
+Each Google Sheet tab can be a page on the site. Same columns.
+
+| Page | URL | Sheet tab |
+| --- | --- | --- |
+| One Piece | https://ycedwin.github.io/tcginv/ | first tab (`gid=0`) |
+| Pokemon | https://ycedwin.github.io/tcginv/#pkm | tab named `pkm` |
+
+Add a tab named exactly `pkm`. Until it exists, that page will say it could not load. PKM art uses `Thumbnail url` or a file in `thumbs/`.
+
 ## Banner
 
 - **designs** — unique cards

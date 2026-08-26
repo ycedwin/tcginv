@@ -75,6 +75,15 @@ assertDeepEqual(
   "parallel art first"
 );
 
+assertDeepEqual(
+  OPShelf.imageCandidates({ id: "SV8-001", set: "SV8", alternate: "", thumbnail: "" }, "pkm"),
+  ["thumbs/SV8-001.webp", "thumbs/SV8-001.png", "thumbs/SV8-001.jpg"],
+  "pkm skips OP art"
+);
+
+assertEqual(OPShelf.pageById("pkm").sheet, "pkm", "pkm page");
+assertEqual(OPShelf.sheetQuery(OPShelf.pageById("pkm")), "sheet=pkm", "pkm query");
+
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');
 assertDeepEqual(OPShelf.rowsFromGviz(gviz), [{ "Card number": "op13-004", Rarity: "l" }], "gviz rows");
 
