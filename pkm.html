@@ -573,7 +573,7 @@
     <p>Personal inventory. Card art from TCGdex and Pokémon Card Game official images. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
   </footer>
 
-  <script src="shelf.js"></script>
+  <script src="shelf.js?v=4"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -628,8 +628,11 @@
         const name = "pkmShelf_" + Date.now();
         const script = document.createElement("script");
         const timer = setTimeout(() => finish(new Error("Sheet timed out")), 12000);
+        let done = false;
 
         function finish(error, json) {
+          if (done) return;
+          done = true;
           clearTimeout(timer);
           delete window[name];
           script.remove();
@@ -638,14 +641,15 @@
         }
 
         window[name] = (json) => finish(null, json);
-        script.src = `https://docs.google.com/spreadsheets/d/${PkmShelf.SHEET_ID}/gviz/tq?gid=${PkmShelf.SHEET_GID}&tqx=responseHandler:${name}&t=${Date.now()}`;
+        const tqx = encodeURIComponent(`out:json;responseHandler:${name}`);
+        script.src = `https://docs.google.com/spreadsheets/d/${PkmShelf.SHEET_ID}/gviz/tq?gid=${PkmShelf.SHEET_GID}&sheet=PKM&tqx=${tqx}&t=${Date.now()}`;
         script.onerror = () => finish(new Error("Could not reach Google Sheets"));
         document.head.append(script);
       });
     }
 
     async function loadCsvFallback() {
-      const response = await fetch(`pkm.csv?v=${Date.now()}`);
+      const response = await fetch(`pkm.csv?v=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return PkmShelf.parseCsv(await response.text());
     }
@@ -837,6 +841,10 @@
     }
 
     async function loadInventory() {
+      if (!window.PkmShelf) {
+        catalog.innerHTML = '<p class="error">Scripts are out of date. Hard-refresh this page (Cmd-Shift-R).</p>';
+        return;
+      }
       refresh.disabled = true;
       refresh.classList.add("is-busy");
       try {

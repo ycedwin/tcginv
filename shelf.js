@@ -461,3 +461,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = OPShelf;
   module.exports.PkmShelf = PkmShelf;
 }
+if (typeof globalThis !== "undefined") {
+  globalThis.OPShelf = OPShelf;
+  globalThis.PkmShelf = PkmShelf;
+}
