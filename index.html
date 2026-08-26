@@ -326,10 +326,21 @@
       background: rgb(0 0 0 / 72%);
       color: #fff;
     }
+    .badge.condition {
+      top: auto;
+      bottom: .55rem;
+      left: .55rem;
+      min-width: 1.6rem;
+      color: #fff;
+    }
+    .badge.condition-a { background: rgb(46 204 113 / 78%); color: #0e1418; }
+    .badge.condition-b { background: rgb(61 139 253 / 78%); }
+    .badge.condition-c { background: rgb(230 184 77 / 78%); color: #1a140c; }
+    .badge.condition-d { background: rgb(220 80 80 / 78%); }
     .badge.sold {
       top: auto;
-      left: .55rem;
-      right: auto;
+      left: auto;
+      right: .55rem;
       bottom: .55rem;
       background: rgb(58 56 52 / 78%);
       color: #c5c0b6;
@@ -621,7 +632,7 @@
     function visibleCards() {
       const query = search.value.trim().toLowerCase();
       const visible = cards.filter((card) => {
-        const blob = `${card.id} ${card.raw} ${card.set} ${card.rarity} ${OPShelf.rarityLabel(card.rarity)} ${card.alternate} ${card.cost} ${card.soldPrice ?? ""}`.toLowerCase();
+        const blob = `${card.id} ${card.raw} ${card.set} ${card.rarity} ${OPShelf.rarityLabel(card.rarity)} ${card.alternate} ${card.condition} ${card.cost} ${card.soldPrice ?? ""}`.toLowerCase();
         const matchesQuery = !query || blob.includes(query);
         const matchesRarity = rarityFilter === "all" || card.rarityKey === rarityFilter;
         const matchesStatus = statusFilter === "all"
@@ -689,6 +700,12 @@
       qty.className = "badge qty";
       qty.textContent = String(card.quantity);
       imageWrap.append(image, rarity, qty);
+      if (card.condition) {
+        const cond = document.createElement("span");
+        cond.className = `badge condition condition-${card.condition.toLowerCase()}`;
+        cond.textContent = card.condition;
+        imageWrap.append(cond);
+      }
       if (card.sold) {
         const soldBadge = document.createElement("span");
         soldBadge.className = "badge sold";

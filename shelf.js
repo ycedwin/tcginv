@@ -123,6 +123,13 @@ const OPShelf = (() => {
     return found ? row[found] : "";
   }
 
+  function parseCondition(value) {
+    const text = String(value == null ? "" : value).trim().toUpperCase();
+    if (!text) return "";
+    const match = text.match(/^([ABCD])(?:[+-])?$/) || text.match(/\b([ABCD])\b/);
+    return match ? match[1] : "";
+  }
+
   function finishCard(card) {
     card.remaining = card.sold ? 0 : card.quantity;
     card.status = card.sold ? "sold" : "in-stock";
@@ -138,10 +145,11 @@ const OPShelf = (() => {
       const rarity = String(pick(row, "Rarity") || "").trim();
       const parsed = parseParallel(pick(row, "Parallel", "Alternate"));
       const alternate = parsed.label;
+      const condition = parseCondition(pick(row, "Condition", "Cond", "状態"));
       const thumbnail = String(pick(row, "Thumbnail url", "thumbnail_url") || "").trim();
       const cost = parseNumber(pick(row, "Cost")) || 0;
       const soldInfo = parseSold(pickSold(row));
-      const key = [id, rarity.toLowerCase(), alternate.toLowerCase(), cost, soldInfo.sold ? (soldInfo.price ?? "sold") : "open"].join("|");
+      const key = [id, rarity.toLowerCase(), alternate.toLowerCase(), condition, cost, soldInfo.sold ? (soldInfo.price ?? "sold") : "open"].join("|");
       const existing = map.get(key);
       if (existing) {
         existing.quantity += 1;
@@ -158,6 +166,7 @@ const OPShelf = (() => {
         alternate,
         parallel: parsed.parallel,
         jollyRoger: parsed.jollyRoger,
+        condition,
         cost,
         soldPrice: soldInfo.price,
         thumbnail,
@@ -241,6 +250,7 @@ const OPShelf = (() => {
     parseAlternate,
     parseParallel,
     imageCandidates,
+    parseCondition,
     parseSold,
     isSold,
     formatPrice,

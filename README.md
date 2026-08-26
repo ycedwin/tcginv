@@ -16,10 +16,11 @@ Personal One Piece Card Game shelf. Edit stock in Google Sheets; the site reads 
 | Rarity | `l` / `sr` / `r` / `uc` / `c` / `p` |
 | Parallel | blank = normal. `y` = Alt art. `jolly roger` = JR foil from [CardRush](https://www.cardrush-op.jp/product/) |
 | Cost | what you paid. Empty or `0` shows as — |
+| Condition | blank = no tag. `A` / `B` / `C` / `D` shows on the image (bottom left) |
 | Sold | empty = in stock. A number = sold at that price |
 | Thumbnail url | optional. Overrides the auto JP image |
 
-Each row is one copy. Same card + same cost + same sold price stacks as qty. Different cost or sold price stays a separate lot.
+Each row is one copy. Same card + same cost + same sold price + same condition stacks as qty. Different cost, sold price, or condition stays a separate lot.
 
 Newest sheet rows show first. The sort button cycles newest-first → card number A–Z → Z–A.
 

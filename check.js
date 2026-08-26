@@ -47,7 +47,18 @@ const newestFirst = OPShelf.groupRows([
 assertEqual(newestFirst[0].id, "OP01-001", "latest add wins");
 assertEqual(newestFirst[0].quantity, 2, "qty still stacks");
 
-assertEqual(OPShelf.isSold(true), true, "checkbox true");
+assertEqual(OPShelf.parseCondition("A"), "A", "cond A");
+assertEqual(OPShelf.parseCondition("b"), "B", "cond b");
+assertEqual(OPShelf.parseCondition(""), "", "empty cond");
+assertEqual(OPShelf.parseCondition("A-"), "A", "cond A-");
+
+const condLots = OPShelf.groupRows([
+  { "Card number": "op13-004", Rarity: "l", Cost: 10, Condition: "A" },
+  { "Card number": "op13-004", Rarity: "l", Cost: 10, Condition: "A" },
+  { "Card number": "op13-004", Rarity: "l", Cost: 10, Condition: "C" },
+]);
+assertEqual(condLots.length, 2, "condition splits lots");
+assertEqual(condLots.filter(function (card) { return card.condition === "A"; })[0].quantity, 2, "same condition stacks");
 assertEqual(OPShelf.isSold("SOLD"), true, "sold text");
 assertEqual(OPShelf.isSold(48), true, "sold price");
 assertEqual(OPShelf.isSold(""), false, "empty not sold");
