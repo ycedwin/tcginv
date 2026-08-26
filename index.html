@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Card inventory</title>
+  <style>
+    :root {
+      --ink: #e8eef2;
+      --muted: #8b9aa3;
+      --cream: #0e1418;
+      --paper: #171f26;
+      --accent: #d4a574;
+      --accent-ink: #1a140c;
+      --green: #2a3d36;
+      --green-ink: #b7d4c4;
+      --line: #2a343c;
+      --shadow: 0 12px 32px rgb(0 0 0 / 38%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--cream);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select { font: inherit; }
+    a { color: inherit; }
+    [hidden] { display: none !important; }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: #18222b;
+    }
+
+    .banner-bar {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: .4rem 0;
+      background: rgb(8 12 16 / 55%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgb(255 255 255 / 8%);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    }
+
+    .banner-tags {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
+      gap: .35rem .7rem;
+      padding: 0 1rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .banner-tags::-webkit-scrollbar { display: none; }
+
+    .banner-tag {
+      flex: 0 0 auto;
+      color: rgb(255 255 255 / 88%);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+
+    .banner-tag + .banner-tag::before {
+      content: "·";
+      margin-right: .7rem;
+      opacity: .45;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.5rem 0 4rem;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(13rem, 1fr) auto;
+      gap: .75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: .75rem;
+      align-items: center;
+    }
+
+    .search-wrap { position: relative; }
+
+    .search-wrap svg {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      width: 1.1rem;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    input, select, .edit-link, .refresh-button, .sort-button {
+      min-height: 3rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 0 1rem 0 2.8rem;
+    }
+
+    input:focus, select:focus, .edit-link:focus-visible, .refresh-button:focus-visible, .sort-button:focus-visible {
+      outline: 3px solid rgb(212 165 116 / 45%);
+      outline-offset: 2px;
+    }
+
+    .edit-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.25rem;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+      font-size: .88rem;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .refresh-button, .sort-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      min-height: 3rem;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .refresh-button svg, .sort-button svg {
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+
+    .refresh-button:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
+    .refresh-button.is-busy svg {
+      animation: spin .8s linear infinite;
+    }
+
+    .sort-button[data-dir="desc"] svg {
+      transform: scaleY(-1);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin: 0 0 1rem;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .summary strong { color: var(--ink); }
+
+    .rarity-nav, .set-nav, .status-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin: 0 0 .75rem;
+    }
+
+    .filter-chip {
+      padding: .55rem .9rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .filter-chip[aria-pressed="true"] {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--green-ink);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .75rem;
+    }
+
+    .card.row {
+      display: grid;
+      grid-template-columns: 8.4rem 1fr;
+      align-items: stretch;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      box-shadow: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .card.row:hover {
+      transform: none;
+      box-shadow: 0 8px 20px rgb(0 0 0 / 28%);
+    }
+
+    .image-wrap {
+      position: relative;
+      min-height: 0;
+      aspect-ratio: auto;
+      height: 100%;
+      overflow: hidden;
+      background: #10161b;
+    }
+
+    .image-wrap img,
+    .image-wrap .image-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 12rem;
+      object-fit: contain;
+      transition: transform 300ms ease;
+    }
+
+    .card:hover img { transform: scale(1.025); }
+
+    .badge {
+      position: absolute;
+      top: .55rem;
+      left: .55rem;
+      max-width: calc(100% - 1.1rem);
+      padding: .35rem .55rem;
+      border-radius: 999px;
+      background: var(--green);
+      color: var(--green-ink);
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge.l { background: #4a3b1f; color: #f0d7a4; }
+    .badge.sr { background: #3b2d52; color: #d7c4f2; }
+    .badge.r { background: #243a55; color: #b7d0ee; }
+    .badge.uc { background: #243f32; color: #b7d4c4; }
+    .badge.c { background: #33383d; color: #c5c9cd; }
+    .badge.p { background: #4a3120; color: #f0c7a0; }
+    .badge.sold {
+      top: auto;
+      left: auto;
+      bottom: .55rem;
+      right: .55rem;
+      background: #3a3834;
+      color: #c5c0b6;
+    }
+    .badge.alt {
+      top: .55rem;
+      left: auto;
+      right: .55rem;
+      background: #3d2a22;
+      color: #f0c7a0;
+    }
+
+    .card.sold .image-wrap img,
+    .card.sold .image-wrap .image-placeholder {
+      opacity: .42;
+      filter: grayscale(.4);
+    }
+
+    .image-placeholder {
+      display: grid;
+      place-items: center;
+      padding: 1.2rem;
+      color: #7c8790;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: .4rem;
+      padding: .75rem .85rem;
+      min-width: 0;
+    }
+
+    .sku {
+      margin: 0;
+      color: var(--muted);
+      font-size: .68rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .card h2 {
+      min-width: 0;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.25;
+    }
+
+    .prices.three {
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+      margin: .1rem 0 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .prices.three .price-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      padding: .4rem .55rem;
+      border: 1px solid var(--line);
+      border-radius: .5rem;
+      background: var(--cream);
+      text-align: left;
+    }
+
+    .price-label {
+      color: var(--muted);
+      font-size: .62rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .price {
+      font-size: .8rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty, .error {
+      grid-column: 1 / -1;
+      padding: 4rem 1rem;
+      border: 1px dashed var(--line);
+      border-radius: 1.25rem;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .back-to-top {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 10;
+      width: 3rem;
+      height: 3rem;
+      border: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-ink);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-size: 1.3rem;
+    }
+
+    footer {
+      padding: 2rem 1rem;
+      background: var(--paper);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: center;
+      font-size: .75rem;
+      line-height: 1.6;
+    }
+
+    footer p { margin: 0; }
+    footer p + p { margin-top: .45rem; }
+
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 610px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .toolbar-actions { justify-content: stretch; }
+      .toolbar-actions .edit-link { flex: 1; }
+      .card.row { grid-template-columns: 7rem 1fr; }
+      .banner-tag { font-size: .58rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="banner-bar">
+      <div class="banner-tags" id="banner-tags">
+        <span class="banner-tag">Loading…</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input id="search" type="search" placeholder="Search cards" autocomplete="off">
+      </div>
+      <div class="toolbar-actions">
+        <button class="sort-button" id="sort" type="button" data-dir="asc" title="Sort by card number" aria-label="Sort by card number">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M8 7h12M8 12h8M8 17h4"></path>
+            <path d="M4 7v10M4 17l-2-2M4 17l2-2"></path>
+          </svg>
+        </button>
+        <button class="refresh-button" id="refresh" type="button" title="Reload sheet" aria-label="Reload sheet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.3-6"></path>
+            <path d="M21 3v6h-6"></path>
+          </svg>
+        </button>
+        <a class="edit-link" id="edit-link" href="https://docs.google.com/spreadsheets/d/13RjDz2IGcvSb8KrWYBPKKtT_ny63emMX2hxmUPxR_pg/edit?gid=0#gid=0" target="_blank" rel="noopener">Edit sheet</a>
+      </div>
+    </div>
+
+    <nav class="status-nav" id="status-nav" aria-label="Filter by status"></nav>
+    <nav class="rarity-nav" id="rarity-nav" aria-label="Filter by rarity"></nav>
+    <nav class="set-nav" id="set-nav" aria-label="Filter by set"></nav>
+
+    <p class="summary">
+      <span><strong id="design-count">0</strong> lots · <strong id="piece-count">0</strong> pieces</span>
+      <span id="source-label">Loading the shelf…</span>
+    </p>
+
+    <section class="grid" id="catalog" aria-live="polite">
+      <p class="empty">Loading the shelf…</p>
+    </section>
+  </main>
+
+  <button class="back-to-top" id="back-to-top" type="button" hidden aria-label="Back to top">↑</button>
+
+  <footer>
+    <p id="footer-meta">Catalog updating…</p>
+    <p>Personal inventory. Official JP digital images include Bandai’s SAMPLE mark. Drop your own photos in thumbs/ to replace them. Not affiliated with Bandai or the One Piece Card Game.</p>
+  </footer>
+
+  <script src="shelf.js"></script>
+  <script>
+    const catalog = document.querySelector("#catalog");
+    const search = document.querySelector("#search");
+    const rarityNav = document.querySelector("#rarity-nav");
+    const setNav = document.querySelector("#set-nav");
+    const statusNav = document.querySelector("#status-nav");
+    const backToTop = document.querySelector("#back-to-top");
+    const refresh = document.querySelector("#refresh");
+    const sortButton = document.querySelector("#sort");
+
+    let cards = [];
+    let source = "sheet";
+    let rarityFilter = "all";
+    let setFilter = "all";
+    let statusFilter = "all";
+    let sortDir = "asc";
+
+    function loadSheetJsonp() {
+      return new Promise((resolve, reject) => {
+        const name = "optcgShelf_" + Date.now();
+        const script = document.createElement("script");
+        const timer = setTimeout(() => finish(new Error("Sheet timed out")), 12000);
+
+        function finish(error, json) {
+          clearTimeout(timer);
+          delete window[name];
+          script.remove();
+          if (error) reject(error);
+          else resolve(OPShelf.rowsFromGviz(json));
+        }
+
+        window[name] = (json) => finish(null, json);
+        script.src = `https://docs.google.com/spreadsheets/d/${OPShelf.SHEET_ID}/gviz/tq?gid=${OPShelf.SHEET_GID}&tqx=responseHandler:${name}&t=${Date.now()}`;
+        script.onerror = () => finish(new Error("Could not reach Google Sheets"));
+        document.head.append(script);
+      });
+    }
+
+    async function loadCsvFallback() {
+      const response = await fetch(`cards.csv?v=${Date.now()}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return OPShelf.parseCsv(await response.text());
+    }
+
+    function renderChipNav(container, options, selected, onSelect) {
+      container.replaceChildren();
+      for (const [value, label] of options) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "filter-chip";
+        button.dataset.value = value;
+        button.textContent = label;
+        button.setAttribute("aria-pressed", String(selected === value));
+        button.addEventListener("click", () => onSelect(value));
+        container.append(button);
+      }
+    }
+
+    function visibleCards() {
+      const query = search.value.trim().toLowerCase();
+      const visible = cards.filter((card) => {
+        const blob = `${card.id} ${card.raw} ${card.set} ${card.rarity} ${OPShelf.rarityLabel(card.rarity)} ${card.alternate} ${card.cost} ${card.soldPrice ?? ""}`.toLowerCase();
+        const matchesQuery = !query || blob.includes(query);
+        const matchesRarity = rarityFilter === "all" || card.rarityKey === rarityFilter;
+        const matchesSet = setFilter === "all" || card.set === setFilter;
+        const matchesStatus = statusFilter === "all"
+          || (statusFilter === "in-stock" && !card.sold)
+          || (statusFilter === "sold" && card.sold);
+        return matchesQuery && matchesRarity && matchesSet && matchesStatus;
+      });
+      visible.sort((a, b) => {
+        const cmp = a.id.localeCompare(b.id, "en", { numeric: true });
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+      return visible;
+    }
+
+    function bindImageFallbacks(image, urls, name) {
+      let index = 0;
+      image.addEventListener("error", () => {
+        index += 1;
+        if (index < urls.length) {
+          image.src = urls[index];
+          return;
+        }
+        const placeholder = document.createElement("div");
+        placeholder.className = "image-placeholder";
+        placeholder.textContent = "Picture not found";
+        image.replaceWith(placeholder);
+      });
+      image.src = urls[0] || "";
+      image.alt = name;
+      if (!urls[0]) image.dispatchEvent(new Event("error"));
+    }
+
+    function productCard(card) {
+      const article = document.createElement("article");
+      article.className = `card row${card.sold ? " sold" : ""}`;
+
+      const imageWrap = document.createElement("div");
+      imageWrap.className = "image-wrap";
+      const image = document.createElement("img");
+      image.loading = "lazy";
+      image.referrerPolicy = "no-referrer";
+      bindImageFallbacks(image, OPShelf.imageCandidates(card), card.id);
+
+      const badge = document.createElement("span");
+      badge.className = `badge ${card.rarityKey}`;
+      badge.textContent = card.quantity > 1
+        ? `${OPShelf.rarityLabel(card.rarity)} · ×${card.quantity}`
+        : OPShelf.rarityLabel(card.rarity);
+      imageWrap.append(image, badge);
+      if (card.alternate) {
+        const altBadge = document.createElement("span");
+        altBadge.className = "badge alt";
+        altBadge.textContent = card.alternate;
+        imageWrap.append(altBadge);
+      }
+      if (card.sold) {
+        const soldBadge = document.createElement("span");
+        soldBadge.className = "badge sold";
+        soldBadge.textContent = card.soldPrice ? `Sold ${OPShelf.formatPrice(card.soldPrice)}` : "Sold";
+        imageWrap.append(soldBadge);
+      }
+
+      const body = document.createElement("div");
+      body.className = "card-body";
+
+      const sku = document.createElement("p");
+      sku.className = "sku";
+      sku.textContent = card.alternate
+        ? `${OPShelf.rarityLabel(card.rarity)} · ${card.alternate}`
+        : OPShelf.rarityLabel(card.rarity);
+
+      const name = document.createElement("h2");
+      name.textContent = card.id;
+
+      const prices = document.createElement("div");
+      prices.className = "prices three";
+      const fields = [
+        ["Set", card.set],
+        ["Qty", String(card.quantity)],
+        ["Cost", OPShelf.formatPrice(card.cost)],
+        ["Sold", card.sold ? OPShelf.formatPrice(card.soldPrice) : "—"],
+      ];
+      for (const [label, value] of fields) {
+        const box = document.createElement("div");
+        box.className = "price-box";
+        const title = document.createElement("span");
+        title.className = "price-label";
+        title.textContent = label;
+        const amount = document.createElement("span");
+        amount.className = "price";
+        amount.textContent = value;
+        box.append(title, amount);
+        prices.append(box);
+      }
+
+      body.append(sku, name, prices);
+      article.append(imageWrap, body);
+      return article;
+    }
+
+    function pieceCount(card) {
+      return card.quantity;
+    }
+
+    function updateHeaderStats(visible) {
+      const identity = (card) => `${card.id}|${card.rarityKey}|${card.alternate}`;
+      const designs = new Set(cards.map(identity)).size;
+      const inStock = cards.reduce((sum, card) => sum + (card.sold ? 0 : card.quantity), 0);
+      const sold = cards.reduce((sum, card) => sum + (card.sold ? card.quantity : 0), 0);
+      const visiblePieces = visible.reduce((sum, card) => sum + pieceCount(card), 0);
+      document.querySelector("#banner-tags").replaceChildren(
+        ...[
+          `${designs} designs · ${inStock} in stock · ${sold} sold`,
+          source === "sheet" ? "Live from Google Sheets" : "Backup CSV",
+          visible.length === cards.length ? "All shown" : `${visible.length} lots · ${visiblePieces} pcs`,
+        ].map((label) => {
+          const tag = document.createElement("span");
+          tag.className = "banner-tag";
+          tag.textContent = label;
+          return tag;
+        })
+      );
+    }
+
+    function renderFilters() {
+      const statusOptions = [["all", "All status"], ["in-stock", "In stock"], ["sold", "Sold"]];
+      renderChipNav(statusNav, statusOptions, statusFilter, (value) => { statusFilter = value; render(); });
+
+      const rarities = OPShelf.RARITY_ORDER.filter((key) => cards.some((card) => card.rarityKey === key));
+      renderChipNav(
+        rarityNav,
+        [["all", "All"], ...rarities.map((key) => [key, OPShelf.rarityLabel(key)])],
+        rarityFilter,
+        (value) => { rarityFilter = value; render(); }
+      );
+
+      const sets = [...new Set(cards.map((card) => card.set))];
+      renderChipNav(
+        setNav,
+        [["all", "All sets"], ...sets.map((set) => [set, set])],
+        setFilter,
+        (value) => { setFilter = value; render(); }
+      );
+    }
+
+    function render() {
+      const visible = visibleCards();
+      catalog.replaceChildren();
+      if (!visible.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = cards.length ? "No cards match that search." : "No cards in the sheet yet.";
+        catalog.append(empty);
+      } else {
+        catalog.append(...visible.map(productCard));
+      }
+
+      document.querySelector("#design-count").textContent = visible.length;
+      document.querySelector("#piece-count").textContent = visible.reduce((sum, card) => sum + pieceCount(card), 0);
+      document.querySelector("#source-label").textContent = source === "sheet" ? "Live sheet" : "Backup CSV";
+      document.querySelector("#footer-meta").textContent = source === "sheet"
+        ? "Reading the published Google Sheet on each load. Refresh after edits if Google is still caching."
+        : "Could not reach Google Sheets, showing cards.csv.";
+      sortButton.dataset.dir = sortDir;
+      updateHeaderStats(visible);
+      for (const button of statusNav.querySelectorAll(".filter-chip")) {
+        button.setAttribute("aria-pressed", String(button.dataset.value === statusFilter));
+      }
+      for (const button of rarityNav.querySelectorAll(".filter-chip")) {
+        button.setAttribute("aria-pressed", String(button.dataset.value === rarityFilter));
+      }
+      for (const button of setNav.querySelectorAll(".filter-chip")) {
+        button.setAttribute("aria-pressed", String(button.dataset.value === setFilter));
+      }
+    }
+
+    async function loadInventory() {
+      refresh.disabled = true;
+      refresh.classList.add("is-busy");
+      try {
+        const rows = await loadSheetJsonp();
+        cards = OPShelf.groupRows(rows);
+        source = "sheet";
+      } catch (error) {
+        console.error(error);
+        try {
+          cards = OPShelf.groupRows(await loadCsvFallback());
+          source = "csv";
+        } catch (fallbackError) {
+          console.error(fallbackError);
+          catalog.innerHTML = '<p class="error">Could not load the Google Sheet or backup cards.csv.</p>';
+          refresh.disabled = false;
+          refresh.classList.remove("is-busy");
+          return;
+        }
+      }
+      if (rarityFilter !== "all" && !cards.some((card) => card.rarityKey === rarityFilter)) rarityFilter = "all";
+      if (setFilter !== "all" && !cards.some((card) => card.set === setFilter)) setFilter = "all";
+      renderFilters();
+      render();
+      refresh.disabled = false;
+      refresh.classList.remove("is-busy");
+    }
+
+    search.addEventListener("input", render);
+    refresh.addEventListener("click", loadInventory);
+    sortButton.addEventListener("click", () => {
+      sortDir = sortDir === "asc" ? "desc" : "asc";
+      render();
+    });
+    window.addEventListener("scroll", () => {
+      backToTop.hidden = window.scrollY < 500;
+    }, { passive: true });
+    backToTop.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    loadInventory();
+  </script>
+</body>
+</html>
