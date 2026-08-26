@@ -36,6 +36,16 @@ assertEqual(grouped.filter(function (card) { return card.id === "OP14-014"; })[0
 assertEqual(grouped.filter(function (card) { return card.id === "OP14-014"; })[0].status, "in-stock", "in stock");
 assertEqual(grouped.filter(function (card) { return card.id === "OP03-121"; })[0].alternate, "Jolly Roger", "alternate");
 assertEqual(grouped.filter(function (card) { return card.id === "OP03-121"; })[0].jollyRoger, true, "jr from parallel col");
+assertEqual(grouped[0].id, "OP14-014", "first lot keeps first-seen order");
+assertEqual(grouped[1].added > grouped[0].added, true, "later row has higher added");
+
+const newestFirst = OPShelf.groupRows([
+  { "Card number": "op01-001", Rarity: "c" },
+  { "Card number": "op02-002", Rarity: "c" },
+  { "Card number": "op01-001", Rarity: "c" },
+]).sort(function (a, b) { return b.added - a.added; });
+assertEqual(newestFirst[0].id, "OP01-001", "latest add wins");
+assertEqual(newestFirst[0].quantity, 2, "qty still stacks");
 
 assertEqual(OPShelf.isSold(true), true, "checkbox true");
 assertEqual(OPShelf.isSold("SOLD"), true, "sold text");

@@ -132,9 +132,9 @@ const OPShelf = (() => {
 
   function groupRows(rows) {
     const map = new Map();
-    for (const row of rows) {
+    rows.forEach((row, index) => {
       const raw = String(pick(row, "Card number", "card_number") || "").trim();
-      if (!raw) continue;
+      if (!raw) return;
       const id = normalizeCardId(raw);
       const rarity = String(pick(row, "Rarity") || "").trim();
       const parsed = parseParallel(pick(row, "Parallel", "Alternate"));
@@ -146,8 +146,9 @@ const OPShelf = (() => {
       const existing = map.get(key);
       if (existing) {
         existing.quantity += 1;
+        existing.added = index;
         if (!existing.thumbnail && thumbnail) existing.thumbnail = thumbnail;
-        continue;
+        return;
       }
       map.set(key, {
         id,
@@ -163,17 +164,10 @@ const OPShelf = (() => {
         thumbnail,
         quantity: 1,
         sold: soldInfo.sold,
+        added: index,
       });
-    }
-    return [...map.values()].map(finishCard).sort((a, b) =>
-      a.set.localeCompare(b.set, "en", { numeric: true })
-      || a.id.localeCompare(b.id, "en", { numeric: true })
-      || a.rarityKey.localeCompare(b.rarityKey)
-      || a.alternate.localeCompare(b.alternate)
-      || Number(a.sold) - Number(b.sold)
-      || a.cost - b.cost
-      || (a.soldPrice || 0) - (b.soldPrice || 0)
-    );
+    });
+    return [...map.values()].map(finishCard);
   }
 
   function cellValue(cell) {

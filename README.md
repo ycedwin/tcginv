@@ -21,6 +21,8 @@ Personal One Piece Card Game shelf. Edit stock in Google Sheets; the site reads 
 
 Each row is one copy. Same card + same cost + same sold price stacks as qty. Different cost or sold price stays a separate lot.
 
+Newest sheet rows show first. The sort button cycles newest-first → card number A–Z → Z–A.
+
 Keep the sheet **Anyone with the link can view**. After edits, refresh the site. Google can cache for a minute or two.
 
 Card images are remembered in the browser after the first successful load, so later visits skip the fallback hunt. Say when a thumbnail needs a refresh.

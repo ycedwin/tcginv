@@ -543,6 +543,7 @@
     let rarityFilter = "all";
     let statusFilter = "all";
     let sortDir = "asc";
+    let sortMode = "added";
     // ponytail: bump THUMB_VER when thumbnails need a refresh.
     const THUMB_VER = "2";
     const THUMB_STORE = "tcginv-thumbs-" + THUMB_VER;
@@ -629,6 +630,7 @@
         return matchesQuery && matchesRarity && matchesStatus;
       });
       visible.sort((a, b) => {
+        if (sortMode === "added") return (b.added ?? 0) - (a.added ?? 0);
         const cmp = a.id.localeCompare(b.id, "en", { numeric: true });
         return sortDir === "asc" ? cmp : -cmp;
       });
@@ -767,7 +769,9 @@
       document.querySelector("#footer-meta").textContent = source === "sheet"
         ? "Reading the published Google Sheet on each load. Refresh after edits if Google is still caching."
         : "Could not reach Google Sheets, showing cards.csv.";
-      sortButton.dataset.dir = sortDir;
+      sortButton.dataset.dir = sortMode === "id" ? sortDir : "added";
+      sortButton.title = sortMode === "added" ? "Newest in the sheet first" : "Sort by card number";
+      sortButton.setAttribute("aria-label", sortButton.title);
       updateHeaderStats(visible);
       for (const button of statusNav.querySelectorAll(".filter-chip")) {
         button.setAttribute("aria-pressed", String(button.dataset.value === statusFilter));
@@ -812,7 +816,15 @@
     });
     refresh.addEventListener("click", loadInventory);
     sortButton.addEventListener("click", () => {
-      sortDir = sortDir === "asc" ? "desc" : "asc";
+      if (sortMode === "added") {
+        sortMode = "id";
+        sortDir = "asc";
+      } else if (sortDir === "asc") {
+        sortDir = "desc";
+      } else {
+        sortMode = "added";
+        sortDir = "asc";
+      }
       render();
     });
     window.addEventListener("scroll", () => {
