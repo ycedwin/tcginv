@@ -34,19 +34,37 @@ const OPShelf = (() => {
     return index === -1 ? id : id.slice(0, index);
   }
 
-  function parseAlternate(value) {
-    if (value === true) return "Alt";
-    if (value === false || value == null) return "";
+  function parseParallel(value) {
+    if (value === true) return { label: "Alt", parallel: true, jollyRoger: false };
+    if (value === false || value == null) return { label: "", parallel: false, jollyRoger: false };
     const text = String(value).trim();
-    if (!text) return "";
-    if (/^(y|yes|true|1|x|✓|✔)$/i.test(text)) return "Alt";
-    return text;
+    if (!text) return { label: "", parallel: false, jollyRoger: false };
+    const lower = text.toLowerCase();
+    const jollyRoger = /jolly\s*roger|\bjr\b/.test(lower);
+    const rest = lower.replace(/jolly\s*roger/g, " ").replace(/\bjr\b/g, " ");
+    const parallel = /^(y|yes|true|1|x|✓|✔|p|alt|parallel)$/i.test(text)
+      || /\b(y|yes|true|parallel|alt)\b/.test(rest);
+    if (jollyRoger && parallel) return { label: "Jolly Roger · Alt", parallel: true, jollyRoger: true };
+    if (jollyRoger) return { label: "Jolly Roger", parallel: false, jollyRoger: true };
+    if (parallel) return { label: "Alt", parallel: true, jollyRoger: false };
+    return { label: text, parallel: true, jollyRoger: false };
   }
 
-  function rarityLabel(rarity) {
-    const key = String(rarity || "").trim().toLowerCase();
-    if (RARITY_LABELS[key]) return key.toUpperCase();
-    return String(rarity || "").toUpperCase() || "?";
+  function parseAlternate(value) {
+    return parseParallel(value).label;
+  }
+
+  function officialArt(id, extra) {
+    const file = extra ? `${id}_${extra}.png` : `${id}.png`;
+    return `https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${file}`)}`;
+  }
+
+  function variantSuffixes(card) {
+    const jr = card.jollyRoger || /jolly\s*roger|\bjr\b/i.test(card.alternate || "");
+    const para = card.parallel || (!!card.alternate && !jr);
+    if (jr) return ["p1", "p2", "p3"];
+    if (para) return ["p1", "p2"];
+    return [];
   }
 
   function imageCandidates(card) {
@@ -54,11 +72,18 @@ const OPShelf = (() => {
     if (card.thumbnail) urls.push(card.thumbnail);
     urls.push(`thumbs/${card.id}.webp`, `thumbs/${card.id}.png`, `thumbs/${card.id}.jpg`);
     const base = `${IMAGE_CDN}/${card.set}/${card.id}`;
-    if (card.alternate) urls.push(`${base}_p1_JP.webp`);
+    const extras = variantSuffixes(card);
+    for (const extra of extras) urls.push(`${base}_${extra}_JP.webp`);
     urls.push(`${base}_JP.webp`);
-    // ponytail: Bandai sets CORP=same-site so we proxy official JP art.
-    urls.push(`https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${card.id}.png`)}`);
+    for (const extra of extras) urls.push(officialArt(card.id, extra));
+    urls.push(officialArt(card.id));
     return [...new Set(urls)];
+  }
+
+  function rarityLabel(rarity) {
+    const key = String(rarity || "").trim().toLowerCase();
+    if (RARITY_LABELS[key]) return key.toUpperCase();
+    return String(rarity || "").toUpperCase() || "?";
   }
 
   function parseNumber(value) {
@@ -112,7 +137,8 @@ const OPShelf = (() => {
       if (!raw) continue;
       const id = normalizeCardId(raw);
       const rarity = String(pick(row, "Rarity") || "").trim();
-      const alternate = parseAlternate(pick(row, "Alternate"));
+      const parsed = parseParallel(pick(row, "Parallel", "Alternate"));
+      const alternate = parsed.label;
       const thumbnail = String(pick(row, "Thumbnail url", "thumbnail_url") || "").trim();
       const cost = parseNumber(pick(row, "Cost")) || 0;
       const soldInfo = parseSold(pickSold(row));
@@ -130,6 +156,8 @@ const OPShelf = (() => {
         rarity,
         rarityKey: rarity.toLowerCase(),
         alternate,
+        parallel: parsed.parallel,
+        jollyRoger: parsed.jollyRoger,
         cost,
         soldPrice: soldInfo.price,
         thumbnail,
@@ -218,6 +246,7 @@ const OPShelf = (() => {
     setCode,
     rarityLabel,
     parseAlternate,
+    parseParallel,
     imageCandidates,
     parseSold,
     isSold,

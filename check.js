@@ -16,7 +16,10 @@ assertEqual(OPShelf.setCode("P-088"), "P", "promo set");
 assertEqual(OPShelf.parseAlternate("y"), "Alt", "y is alt");
 assertEqual(OPShelf.parseAlternate("yes"), "Alt", "yes is alt");
 assertEqual(OPShelf.parseAlternate(""), "", "empty alt");
-assertEqual(OPShelf.parseAlternate("jolly roger"), "jolly roger", "named alt");
+assertEqual(OPShelf.parseAlternate("jolly roger"), "Jolly Roger", "jr label");
+assertEqual(OPShelf.parseParallel("jolly roger, y").label, "Jolly Roger · Alt", "jr and parallel");
+assertEqual(OPShelf.parseParallel("jolly roger, y").jollyRoger, true, "jr flag");
+assertEqual(OPShelf.parseParallel("jolly roger, y").parallel, true, "parallel flag");
 
 const grouped = OPShelf.groupRows([
   { "Card number": "op14-014", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
@@ -24,14 +27,15 @@ const grouped = OPShelf.groupRows([
   { "Card number": "op14-014", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
   { "Card number": "op14-014", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
   { "Card number": "op14-014", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
-  { "Card number": "op03-121", Rarity: "c", Alternate: "jolly roger", Cost: 0, "Thumbnail url": "" },
+  { "Card number": "op03-121", Rarity: "c", Parallel: "jolly roger", Cost: 0, "Thumbnail url": "" },
   { "Card number": "", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
 ]);
 assertEqual(grouped.length, 2, "group count");
 assertEqual(grouped.filter(function (card) { return card.id === "OP14-014"; })[0].quantity, 5, "qty");
 assertEqual(grouped.filter(function (card) { return card.id === "OP14-014"; })[0].sold, false, "unsold");
 assertEqual(grouped.filter(function (card) { return card.id === "OP14-014"; })[0].status, "in-stock", "in stock");
-assertEqual(grouped.filter(function (card) { return card.id === "OP03-121"; })[0].alternate, "jolly roger", "alternate");
+assertEqual(grouped.filter(function (card) { return card.id === "OP03-121"; })[0].alternate, "Jolly Roger", "alternate");
+assertEqual(grouped.filter(function (card) { return card.id === "OP03-121"; })[0].jollyRoger, true, "jr from parallel col");
 
 assertEqual(OPShelf.isSold(true), true, "checkbox true");
 assertEqual(OPShelf.isSold("SOLD"), true, "sold text");
@@ -63,22 +67,27 @@ assertEqual(soldFortyFive.quantity, 1, "different sold price is own lot");
 assertEqual(lots.filter(function (card) { return card.id === "OP17-063"; })[0].status, "sold", "sold without price");
 
 assertDeepEqual(
-  OPShelf.imageCandidates({ id: "OP06-065", set: "OP06", alternate: "jolly roger", thumbnail: "" }),
+  OPShelf.imageCandidates({ id: "OP06-065", set: "OP06", alternate: "Jolly Roger · Alt", jollyRoger: true, parallel: true, thumbnail: "" }),
   [
     "thumbs/OP06-065.webp",
     "thumbs/OP06-065.png",
     "thumbs/OP06-065.jpg",
     "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_p1_JP.webp",
+    "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_p2_JP.webp",
+    "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_p3_JP.webp",
     "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-065_JP.webp",
+    "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065_p1.png",
+    "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065_p2.png",
+    "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065_p3.png",
     "https://wsrv.nl/?url=www.onepiece-cardgame.com%2Fimages%2Fcardlist%2Fcard%2FOP06-065.png",
   ],
-  "parallel art first"
+  "jr plus parallel tries p1-p3"
 );
 
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');
 assertDeepEqual(OPShelf.rowsFromGviz(gviz), [{ "Card number": "op13-004", Rarity: "l" }], "gviz rows");
 
-const csv = OPShelf.parseCsv("Card number,Rarity,Alternate,Cost,Sold,Thumbnail url\nop17-063,sr,,0,y,\n");
+const csv = OPShelf.parseCsv("Card number,Rarity,Parallel,Cost,Sold,Thumbnail url\nop17-063,sr,,0,y,\n");
 assertEqual(csv[0]["Card number"], "op17-063", "csv parse");
 assertEqual(csv[0].Sold, "y", "csv sold");
 

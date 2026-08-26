@@ -14,7 +14,7 @@ Personal One Piece Card Game shelf. Edit stock in Google Sheets; the site reads 
 | --- | --- |
 | Card number | `op13-004` — set is already in the id |
 | Rarity | `l` / `sr` / `r` / `uc` / `c` / `p` |
-| Alternate | blank = normal. `y` = Alt. Other text (e.g. `jolly roger`) is shown as-is |
+| Parallel | blank = normal. `y` = Alt art. `jolly roger` = JR foil. `jolly roger, y` = both |
 | Cost | what you paid. Empty or `0` shows as — |
 | Sold | empty = in stock. A number = sold at that price |
 | Thumbnail url | optional. Overrides the auto JP image |
