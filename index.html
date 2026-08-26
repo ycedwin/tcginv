@@ -207,8 +207,26 @@
       display: flex;
       flex-wrap: wrap;
       gap: .5rem;
+      margin: 0;
+    }
+
+    .rarity-fold {
       margin: 0 0 .75rem;
     }
+
+    .rarity-fold > summary {
+      width: fit-content;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .78rem;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    .rarity-fold > summary::-webkit-details-marker { display: none; }
+    .rarity-fold[open] > summary { margin-bottom: .5rem; }
+
+    .status-nav { margin: 0 0 .75rem; }
 
     .filter-chip {
       padding: .55rem .9rem;
@@ -475,7 +493,10 @@
     </div>
 
     <nav class="status-nav" id="status-nav" aria-label="Filter by status"></nav>
-    <nav class="rarity-nav" id="rarity-nav" aria-label="Filter by rarity"></nav>
+    <details class="rarity-fold">
+      <summary>Rarity</summary>
+      <nav class="rarity-nav" id="rarity-nav" aria-label="Filter by rarity"></nav>
+    </details>
 
     <p class="summary">
       <span><strong id="design-count">0</strong> lots · <strong id="piece-count">0</strong> pieces</span>
