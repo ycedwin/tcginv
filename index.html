@@ -192,18 +192,6 @@
       to { transform: rotate(360deg); }
     }
 
-    .summary {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin: 0 0 1rem;
-      color: var(--muted);
-      font-size: .88rem;
-    }
-
-    .summary strong { color: var(--ink); }
-
     .filter-row {
       display: flex;
       align-items: center;
@@ -525,11 +513,6 @@
     </div>
     <nav class="rarity-nav" id="rarity-nav" hidden aria-label="Filter by rarity"></nav>
 
-    <p class="summary">
-      <span><strong id="design-count">0</strong> lots · <strong id="piece-count">0</strong> pieces</span>
-      <span id="source-label">Loading the shelf…</span>
-    </p>
-
     <section class="grid" id="catalog" aria-live="polite">
       <p class="empty">Loading the shelf…</p>
     </section>
@@ -741,9 +724,6 @@
         catalog.append(...visible.map(productCard));
       }
 
-      document.querySelector("#design-count").textContent = visible.length;
-      document.querySelector("#piece-count").textContent = visible.reduce((sum, card) => sum + pieceCount(card), 0);
-      document.querySelector("#source-label").textContent = source === "sheet" ? "Live sheet" : "Backup CSV";
       document.querySelector("#footer-meta").textContent = source === "sheet"
         ? "Reading the published Google Sheet on each load. Refresh after edits if Google is still caching."
         : "Could not reach Google Sheets, showing cards.csv.";

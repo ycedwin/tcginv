@@ -30,8 +30,6 @@ Keep the sheet **Anyone with the link can view**. After edits, refresh the site.
 - **sold** — copies with a sold price
 - **All shown** — no search/filter hiding cards
 
-Sheet vs backup CSV is under the search bar (`Live sheet` / `Backup CSV`), not in the banner.
-
 ## Local
 
 ```bash
