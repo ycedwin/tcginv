@@ -85,6 +85,36 @@
       padding: 1.5rem 0 4rem;
     }
 
+    .brand {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: .7rem;
+      margin: 0 0 1rem;
+    }
+
+    .brand-mark {
+      width: 2.6rem;
+      height: 2.6rem;
+      flex: 0 0 auto;
+    }
+
+    .brand-name {
+      color: #e31c23;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-style: italic;
+      font-weight: 900;
+      letter-spacing: .06em;
+      line-height: 1;
+      text-shadow:
+        -2px -2px 0 #111,
+        2px -2px 0 #111,
+        -2px 2px 0 #111,
+        2px 2px 0 #111;
+      transform: scaleY(1.12);
+      transform-origin: left center;
+    }
+
     .toolbar {
       display: grid;
       grid-template-columns: minmax(13rem, 1fr) auto;
@@ -188,7 +218,7 @@
 
     .summary strong { color: var(--ink); }
 
-    .rarity-nav, .set-nav, .status-nav {
+    .rarity-nav, .status-nav {
       display: flex;
       flex-wrap: wrap;
       gap: .5rem;
@@ -430,6 +460,19 @@
   </header>
 
   <main>
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="38" r="16" fill="#f4efe6"/>
+        <ellipse cx="32" cy="22" rx="22" ry="10" fill="#e3b23c"/>
+        <ellipse cx="32" cy="18" rx="20" ry="6" fill="#f0c85a"/>
+        <path d="M14 22c6-8 30-8 36 0" fill="none" stroke="#c48a22" stroke-width="3"/>
+        <circle cx="26" cy="38" r="3" fill="#111"/>
+        <circle cx="38" cy="38" r="3" fill="#111"/>
+        <path d="M28 46c2.4 2 5.6 2 8 0" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+        <path d="M18 50l-8 8M46 50l8 8M18 58l-6-8M46 58l6-8" stroke="#f4efe6" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">ONE PIECE</span>
+    </div>
     <div class="toolbar">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -457,7 +500,6 @@
 
     <nav class="status-nav" id="status-nav" aria-label="Filter by status"></nav>
     <nav class="rarity-nav" id="rarity-nav" aria-label="Filter by rarity"></nav>
-    <nav class="set-nav" id="set-nav" aria-label="Filter by set"></nav>
 
     <p class="summary">
       <span><strong id="design-count">0</strong> lots · <strong id="piece-count">0</strong> pieces</span>
@@ -481,7 +523,6 @@
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
     const rarityNav = document.querySelector("#rarity-nav");
-    const setNav = document.querySelector("#set-nav");
     const statusNav = document.querySelector("#status-nav");
     const backToTop = document.querySelector("#back-to-top");
     const refresh = document.querySelector("#refresh");
@@ -490,7 +531,6 @@
     let cards = [];
     let source = "sheet";
     let rarityFilter = "all";
-    let setFilter = "all";
     let statusFilter = "all";
     let sortDir = "asc";
 
@@ -541,11 +581,10 @@
         const blob = `${card.id} ${card.raw} ${card.set} ${card.rarity} ${OPShelf.rarityLabel(card.rarity)} ${card.alternate} ${card.cost} ${card.soldPrice ?? ""}`.toLowerCase();
         const matchesQuery = !query || blob.includes(query);
         const matchesRarity = rarityFilter === "all" || card.rarityKey === rarityFilter;
-        const matchesSet = setFilter === "all" || card.set === setFilter;
         const matchesStatus = statusFilter === "all"
           || (statusFilter === "in-stock" && !card.sold)
           || (statusFilter === "sold" && card.sold);
-        return matchesQuery && matchesRarity && matchesSet && matchesStatus;
+        return matchesQuery && matchesRarity && matchesStatus;
       });
       visible.sort((a, b) => {
         const cmp = a.id.localeCompare(b.id, "en", { numeric: true });
@@ -664,14 +703,6 @@
         rarityFilter,
         (value) => { rarityFilter = value; render(); }
       );
-
-      const sets = [...new Set(cards.map((card) => card.set))];
-      renderChipNav(
-        setNav,
-        [["all", "All sets"], ...sets.map((set) => [set, set])],
-        setFilter,
-        (value) => { setFilter = value; render(); }
-      );
     }
 
     function render() {
@@ -700,9 +731,6 @@
       for (const button of rarityNav.querySelectorAll(".filter-chip")) {
         button.setAttribute("aria-pressed", String(button.dataset.value === rarityFilter));
       }
-      for (const button of setNav.querySelectorAll(".filter-chip")) {
-        button.setAttribute("aria-pressed", String(button.dataset.value === setFilter));
-      }
     }
 
     async function loadInventory() {
@@ -726,7 +754,6 @@
         }
       }
       if (rarityFilter !== "all" && !cards.some((card) => card.rarityKey === rarityFilter)) rarityFilter = "all";
-      if (setFilter !== "all" && !cards.some((card) => card.set === setFilter)) setFilter = "all";
       renderFilters();
       render();
       refresh.disabled = false;
