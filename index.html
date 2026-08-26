@@ -285,6 +285,8 @@
 
     .image-wrap img,
     .image-wrap .image-placeholder {
+      position: relative;
+      z-index: 0;
       width: 100%;
       height: 100%;
       object-fit: contain;
@@ -297,7 +299,7 @@
       position: absolute;
       top: .55rem;
       left: .55rem;
-      z-index: 1;
+      z-index: 2;
       min-width: 1.85rem;
       padding: .42rem .7rem;
       border-radius: 999px;
