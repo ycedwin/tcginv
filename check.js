@@ -66,6 +66,9 @@ assertEqual(OPShelf.isSold("no"), false, "no");
 assertEqual(OPShelf.parseSold(48).price, 48, "parse sold price");
 assertEqual(OPShelf.formatPrice(48), "48", "format sold price");
 assertEqual(OPShelf.formatPrice(0), "—", "format zero");
+assertEqual(OPShelf.formatHkdFromYen(0), "—", "hkd zero");
+assertEqual(OPShelf.formatHkdFromYen(200, 0.05), "HK$10", "hkd from yen");
+assertEqual(OPShelf.formatHkdFromYen(2500, 0.05), "HK$125", "hkd 2500 yen");
 
 const lots = OPShelf.groupRows([
   { "Card number": "op13-004", Rarity: "l", Alternate: "", Cost: 10, Sold: "" },
