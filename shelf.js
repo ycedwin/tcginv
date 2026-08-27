@@ -319,12 +319,15 @@ const PkmShelf = (() => {
     "sh|014/053": "products/v-014053sh-l-2-4695600.jpg",
     "mp1|006/023": "files/ex-006023mp1-1432706.webp",
     "sv-p|291/sv-p": "files/promo291sv-psv-p-1726857.webp",
+    "oldback|#067": "products/op00-2-7948918.jpg",
+    "oldback|067": "products/op00-2-7948918.jpg",
   };
 
   function canonicalSet(raw) {
     const text = String(raw || "").trim();
     if (!text) return "";
     if (/^promo$/i.test(text)) return "SV-P";
+    if (/^old\s*back$/i.test(text) || text === "旧裏") return "OldBack";
     const match = text.match(/^([a-z]+)(\d*)([a-z]*)$/i);
     if (!match) return text.toUpperCase();
     const prefix = match[1].toUpperCase();
@@ -364,6 +367,11 @@ const PkmShelf = (() => {
   function parseCollector(raw) {
     const text = String(raw || "").trim();
     if (!text) return { localId: "", number: "", raw: "" };
+    const dex = text.match(/^#\s*(\d+)$/);
+    if (dex) {
+      const localId = dex[1].padStart(3, "0");
+      return { localId, number: `#${localId}`, raw: text };
+    }
     const promo = text.match(/^(\d+)\s*\/\s*sv-?p$/i);
     if (promo) {
       const localId = promo[1].padStart(3, "0");

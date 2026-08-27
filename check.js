@@ -104,6 +104,9 @@ assertEqual(PkmShelf.canonicalSet("sv3"), "SV3", "pkm set sv3");
 assertEqual(PkmShelf.canonicalSet("s10b"), "S10b", "pkm set s10b");
 assertEqual(PkmShelf.canonicalSet("svJL"), "SVJL", "pkm set svJL");
 assertEqual(PkmShelf.canonicalSet("promo"), "SV-P", "pkm promo set");
+assertEqual(PkmShelf.canonicalSet("old back"), "OldBack", "pkm old back set");
+assertEqual(PkmShelf.parseCollector("#067").localId, "067", "pkm dex num");
+assertEqual(PkmShelf.parseCollector("#067").number, "#067", "pkm dex display");
 assertEqual(PkmShelf.parseCollector("066/108").localId, "066", "pkm collector");
 assertEqual(PkmShelf.parseCollector("066/108").number, "066/108", "pkm number");
 assertEqual(PkmShelf.parseCollector("291/sv-p").localId, "291", "pkm promo num");
@@ -144,6 +147,18 @@ assertEqual(
   }),
   true,
   "pkm promo hareruya"
+);
+assertEqual(
+  PkmShelf.imageCandidates({ set: "OldBack", localId: "067", number: "#067", thumbnail: "" }).some(function (url) {
+    return /op00-2-7948918/.test(url);
+  }),
+  true,
+  "pkm old back hareruya"
+);
+assertEqual(
+  PkmShelf.groupRows([{ Set: "old back", "Card number": "#067" }])[0].id,
+  "OldBack #067",
+  "pkm old back id"
 );
 
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');

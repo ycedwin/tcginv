@@ -30,8 +30,8 @@ Same spreadsheet, tab **PKM**. Page: [pkm.html](https://ycedwin.github.io/tcginv
 
 | Column | What it does |
 | --- | --- |
-| Set | JP set code: `sv3`, `s10b`, `sv4a`. `promo` = SV-P |
-| Card number | `066/108` or `291/sv-p` |
+| Set | JP set code: `sv3`, `s10b`, `sv4a`. `promo` = SV-P. `old back` = 旧裏 |
+| Card number | `066/108`, `291/sv-p`, or `#067` for old-back dex numbers |
 | Rarity | `C` / `R` / `RR` / `RRR` / `AR` / `SR` / `CHR` / … — blank = no tag |
 | Cost(Yen) | what you paid. Empty or `0` shows as — |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` |
