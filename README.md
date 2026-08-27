@@ -33,9 +33,9 @@ Same spreadsheet, tab **PKM**. Page: [pkm.html](https://ycedwin.github.io/tcginv
 | Set | JP set code: `sv3`, `s10b`, `sv4a`. `promo` = SV-P. `old back` = 旧裏. `SoulSilver Collection` = L1 |
 | Card number | `066/108`, `291/sv-p`, or `#067` for old-back dex numbers |
 | Rarity | `C` / `R` / `RR` / `RRR` / `AR` / `SR` / `CHR` / … — blank = no tag |
-| Cost(Yen) | yen in the sheet. The PKM page shows Cost and Sold as HKD at ¥1 = HK$0.05 |
+| Cost(Yen) | yen in the sheet. The PKM page shows it as HKD at ¥1 = HK$0.05 |
+| Sold | empty = in stock. A number = sold price in HKD (shown as HK$) |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` |
-| Sold | empty = in stock. A number = sold at that price |
 
 Images come from [TCGdex](https://tcgdex.dev) JP art. If that file is missing, a few odd sets fall back to [Hareruya2](https://www.hareruya2.com/). Override anything with `thumbs/pkm/SV3-066.jpg`.
 

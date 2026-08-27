@@ -116,6 +116,11 @@ const OPShelf = (() => {
     return Number.isInteger(num) ? String(num) : String(Math.round(num * 100) / 100);
   }
 
+  function formatHkd(value) {
+    const text = formatPrice(value);
+    return text === "—" ? "—" : "HK$" + text;
+  }
+
   // ponytail: sheet stays yen; 1 JPY = 0.05 HKD on the PKM page only.
   function formatHkdFromYen(value) {
     if (value == null || value === "") return "—";
@@ -264,6 +269,7 @@ const OPShelf = (() => {
     pickSold,
     isSold,
     formatPrice,
+    formatHkd,
     formatHkdFromYen,
     groupRows,
     pick,
@@ -489,6 +495,7 @@ const PkmShelf = (() => {
     parseSold: OPShelf.parseSold,
     isSold: OPShelf.isSold,
     formatPrice: OPShelf.formatPrice,
+    formatHkd: OPShelf.formatHkd,
     formatHkdFromYen: OPShelf.formatHkdFromYen,
     rowsFromGviz: OPShelf.rowsFromGviz,
     parseCsv: OPShelf.parseCsv,
