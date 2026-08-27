@@ -116,31 +116,13 @@ const OPShelf = (() => {
     return Number.isInteger(num) ? String(num) : String(Math.round(num * 100) / 100);
   }
 
-  // ponytail: sheet stays yen; web-only HKD. Fallback if FX fetch fails.
-  const JPY_TO_HKD = 0.049;
-  let jpyToHkd = JPY_TO_HKD;
-
-  function formatHkdFromYen(value, rate) {
+  // ponytail: sheet stays yen; 1 JPY = 0.05 HKD on the PKM page only.
+  function formatHkdFromYen(value) {
     if (value == null || value === "") return "—";
     const yen = Number(value);
     if (!Number.isFinite(yen) || yen === 0) return "—";
-    const fx = Number(rate);
-    const use = Number.isFinite(fx) && fx > 0 ? fx : jpyToHkd;
-    const hkd = Math.round(yen * use);
+    const hkd = Math.round(yen * 0.05);
     return "HK$" + (hkd > 0 ? hkd : 1);
-  }
-
-  function loadYenToHkd() {
-    if (typeof fetch !== "function") return Promise.resolve(false);
-    return fetch("https://api.frankfurter.dev/v1/latest?from=JPY&to=HKD")
-      .then((response) => response.ok ? response.json() : null)
-      .then((data) => {
-        const rate = data && data.rates && Number(data.rates.HKD);
-        if (!(rate > 0) || rate === jpyToHkd) return false;
-        jpyToHkd = rate;
-        return true;
-      })
-      .catch(() => false);
   }
 
   function pickSold(row) {
@@ -283,7 +265,6 @@ const OPShelf = (() => {
     isSold,
     formatPrice,
     formatHkdFromYen,
-    loadYenToHkd,
     groupRows,
     pick,
     parseNumber,
@@ -509,7 +490,6 @@ const PkmShelf = (() => {
     isSold: OPShelf.isSold,
     formatPrice: OPShelf.formatPrice,
     formatHkdFromYen: OPShelf.formatHkdFromYen,
-    loadYenToHkd: OPShelf.loadYenToHkd,
     rowsFromGviz: OPShelf.rowsFromGviz,
     parseCsv: OPShelf.parseCsv,
   };

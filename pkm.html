@@ -573,7 +573,7 @@
     <p>Personal inventory. Card art from TCGdex and Pokémon Card Game official images. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
   </footer>
 
-  <script src="shelf.js?v=8"></script>
+  <script src="shelf.js?v=9"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -759,7 +759,7 @@
       prices.className = "prices";
       for (const [label, value] of [
         ["Cost", PkmShelf.formatHkdFromYen(card.cost)],
-        ["Sold", card.sold ? PkmShelf.formatPrice(card.soldPrice) : "—"],
+        ["Sold", card.sold ? PkmShelf.formatHkdFromYen(card.soldPrice) : "—"],
       ]) {
         const box = document.createElement("div");
         box.className = "price-box";
@@ -847,7 +847,6 @@
       }
       refresh.disabled = true;
       refresh.classList.add("is-busy");
-      const rateP = PkmShelf.loadYenToHkd();
       try {
         const rows = await loadSheetJsonp();
         cards = PkmShelf.groupRows(rows);
@@ -868,7 +867,6 @@
       if (rarityFilter !== "all" && !cards.some((card) => card.rarityKey === rarityFilter)) rarityFilter = "all";
       renderFilters();
       render();
-      if (await rateP) render();
       refresh.disabled = false;
       refresh.classList.remove("is-busy");
     }
