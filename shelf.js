@@ -321,6 +321,7 @@ const PkmShelf = (() => {
     "sv-p|291/sv-p": "files/promo291sv-psv-p-1726857.webp",
     "oldback|#067": "products/op00-2-7948918.jpg",
     "oldback|067": "products/op00-2-7948918.jpg",
+    "l1|031/070": "products/r031070l1-l-2-1098972.jpg",
   };
 
   function canonicalSet(raw) {
@@ -328,6 +329,7 @@ const PkmShelf = (() => {
     if (!text) return "";
     if (/^promo$/i.test(text)) return "SV-P";
     if (/^old\s*back$/i.test(text) || text === "旧裏") return "OldBack";
+    if (/soul\s*silver/i.test(text) || text === "ソウルシルバーコレクション") return "L1";
     const match = text.match(/^([a-z]+)(\d*)([a-z]*)$/i);
     if (!match) return text.toUpperCase();
     const prefix = match[1].toUpperCase();
