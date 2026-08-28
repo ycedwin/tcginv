@@ -113,6 +113,20 @@ assertEqual(
   "st01-007 p5 before limitless"
 );
 
+const p022 = OPShelf.imageCandidates({ id: "P-022", set: "P", alternate: "", jollyRoger: false, parallel: false, thumbnail: "" });
+assertEqual(p022[0].indexOf("thumbs/") === 0, true, "p-022 thumbs first");
+assertEqual(
+  p022.some(function (url) { return url.indexOf("O-4AAOSwjqRmSDcD") !== -1; }),
+  true,
+  "p-022 ebay"
+);
+assertEqual(
+  p022.findIndex(function (url) { return url.indexOf("O-4AAOSwjqRmSDcD") !== -1; })
+    < p022.findIndex(function (url) { return /limitless/.test(url); }),
+  true,
+  "p-022 ebay before limitless"
+);
+
 assertEqual(PkmShelf.canonicalSet("sv3"), "SV3", "pkm set sv3");
 assertEqual(PkmShelf.canonicalSet("s10b"), "S10b", "pkm set s10b");
 assertEqual(PkmShelf.canonicalSet("svJL"), "SVJL", "pkm set svJL");
