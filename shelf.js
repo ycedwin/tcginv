@@ -68,6 +68,13 @@ const OPShelf = (() => {
     return parseParallel(value).label;
   }
 
+  function parallelMark(alternate) {
+    const text = String(alternate || "");
+    if (text === "Alt") return "★";
+    if (text === "Jolly Roger · Alt") return "Jolly Roger · ★";
+    return text;
+  }
+
   function officialArt(id) {
     return `https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${id}.png`)}`;
   }
@@ -291,6 +298,7 @@ const OPShelf = (() => {
     rarityLabel,
     parseAlternate,
     parseParallel,
+    parallelMark,
     imageCandidates,
     parseCondition,
     parseSold,

@@ -563,7 +563,7 @@
     <p>Personal inventory. Official JP digital images include Bandai’s SAMPLE mark. Drop your own photos in thumbs/ to replace them. Not affiliated with Bandai or the One Piece Card Game.</p>
   </footer>
 
-  <script src="shelf.js?v=8"></script>
+  <script src="shelf.js?v=9"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -708,7 +708,7 @@
       head.append(name);
       const sku = document.createElement("p");
       sku.className = "sku";
-      sku.textContent = card.alternate || "\u00a0";
+      sku.textContent = OPShelf.parallelMark(card.alternate) || "\u00a0";
       head.append(sku);
 
       const imageWrap = document.createElement("div");
