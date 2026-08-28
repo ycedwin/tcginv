@@ -10,6 +10,10 @@ const OPShelf = (() => {
     "OP06-064": `${CARDRUSH_IMG}/PRB01-02_66.jpg`,
     "OP06-065": `${CARDRUSH_IMG}/PRB01-02_64.jpg`,
   };
+  // ponytail: official filenames are not always {id}.png (this Nami is _p5).
+  const OFFICIAL_FILE = {
+    "ST01-007": "ST01-007_p5.png",
+  };
   const RARITY_LABELS = {
     l: "Leader",
     sr: "Super Rare",
@@ -62,7 +66,9 @@ const OPShelf = (() => {
   }
 
   function officialArt(id) {
-    return `https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${id}.png`)}`;
+    const file = OFFICIAL_FILE[id] || `${id}.png`;
+    const host = OFFICIAL_FILE[id] ? "asia-tc.onepiece-cardgame.com" : "www.onepiece-cardgame.com";
+    return `https://wsrv.nl/?url=${encodeURIComponent(`${host}/images/cardlist/card/${file}`)}`;
   }
 
   function imageCandidates(card) {
@@ -72,10 +78,11 @@ const OPShelf = (() => {
     const jr = card.jollyRoger || /jolly\s*roger|\bjr\b/i.test(card.alternate || "");
     const para = card.parallel || (!!card.alternate && !jr);
     if (jr && JR_THUMBS[card.id]) urls.push(JR_THUMBS[card.id]);
+    if (OFFICIAL_FILE[card.id]) urls.push(officialArt(card.id));
     const base = `${IMAGE_CDN}/${card.set}/${card.id}`;
     if (para) urls.push(`${base}_p1_JP.webp`);
     urls.push(`${base}_JP.webp`);
-    urls.push(officialArt(card.id));
+    if (!OFFICIAL_FILE[card.id]) urls.push(officialArt(card.id));
     return [...new Set(urls)];
   }
 

@@ -104,6 +104,15 @@ assertDeepEqual(
   "jr uses cardrush"
 );
 
+const st01 = OPShelf.imageCandidates({ id: "ST01-007", set: "ST01", alternate: "", jollyRoger: false, parallel: false, thumbnail: "" });
+assertEqual(st01.some(function (url) { return /ST01-007_p5/.test(url); }), true, "st01-007 p5");
+assertEqual(
+  st01.findIndex(function (url) { return /ST01-007_p5/.test(url); })
+    < st01.findIndex(function (url) { return /limitless/.test(url); }),
+  true,
+  "st01-007 p5 before limitless"
+);
+
 assertEqual(PkmShelf.canonicalSet("sv3"), "SV3", "pkm set sv3");
 assertEqual(PkmShelf.canonicalSet("s10b"), "S10b", "pkm set s10b");
 assertEqual(PkmShelf.canonicalSet("svJL"), "SVJL", "pkm set svJL");
