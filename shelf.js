@@ -166,7 +166,7 @@ const OPShelf = (() => {
       const parsed = parseParallel(pick(row, "Parallel", "Alternate"));
       const alternate = parsed.label;
       const condition = parseCondition(pick(row, "Condition", "Cond", "状態"));
-      const thumbnail = String(pick(row, "Thumbnail url", "thumbnail_url") || "").trim();
+      const thumbnail = pickThumbnail(row);
       const cost = parseNumber(pick(row, "Cost")) || 0;
       const soldInfo = parseSold(pickSold(row));
       const key = [id, rarity.toLowerCase(), alternate.toLowerCase(), condition, cost, soldInfo.sold ? (soldInfo.price ?? "sold") : "open"].join("|");
@@ -198,9 +198,24 @@ const OPShelf = (() => {
     return [...map.values()].map(finishCard);
   }
 
+  function parseThumbUrl(value) {
+    const text = String(value == null ? "" : value).trim();
+    const match = text.match(/https?:\/\/[^\s"'<>\\]+/i);
+    return match ? match[0].replace(/[),]+$/, "") : "";
+  }
+
+  function pickThumbnail(row) {
+    const named = pick(row, "Thumbnail url", "Thumbnail URL", "Thumbnail", "Thumb", "Image url");
+    if (named) return parseThumbUrl(named);
+    const found = Object.keys(row).find((name) => /thumbnail/i.test(String(name)));
+    return parseThumbUrl(found ? row[found] : "");
+  }
+
   function cellValue(cell) {
-    if (!cell || cell.v == null) return "";
-    return cell.v;
+    if (!cell) return "";
+    if (cell.v != null && cell.v !== "") return cell.v;
+    if (cell.f) return cell.f;
+    return cell.v == null ? "" : cell.v;
   }
 
   function parseGvizText(text) {

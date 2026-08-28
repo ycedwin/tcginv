@@ -563,7 +563,7 @@
     <p>Personal inventory. Official JP digital images include Bandai’s SAMPLE mark. Drop your own photos in thumbs/ to replace them. Not affiliated with Bandai or the One Piece Card Game.</p>
   </footer>
 
-  <script src="shelf.js?v=6"></script>
+  <script src="shelf.js?v=7"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -675,7 +675,7 @@
 
     function bindImageFallbacks(image, card) {
       const urls = OPShelf.imageCandidates(card);
-      const known = knownThumb(card);
+      const known = card.thumbnail ? "" : knownThumb(card);
       const list = known ? [known, ...urls.filter((url) => url !== known)] : urls;
       let index = 0;
       image.addEventListener("error", () => {

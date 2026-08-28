@@ -20,7 +20,7 @@ Personal One Piece and Pokémon shelves. Edit stock in Google Sheets; the site r
 | Cost | what you paid. Empty or `0` shows as — |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` shows on the image (bottom left) |
 | Sold | empty = in stock. A number = sold at that price |
-| Thumbnail url | optional. Overrides the auto JP image |
+| Thumbnail / Thumbnail url | optional `https://…` URL. Used first when present |
 
 Each row is one copy. Same card + same cost + same sold price + same condition stacks as qty. Different cost, sold price, or condition stays a separate lot.
 

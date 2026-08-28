@@ -224,6 +224,17 @@ assertEqual(
   "pkm soulsilver hareruya"
 );
 
+const thumbRow = OPShelf.groupRows([
+  { "Card number": "p-022", Rarity: "p", Thumbnail: "https://i.ebayimg.com/images/g/O-4AAOSwjqRmSDcD/s-l960.webp" },
+])[0];
+assertEqual(thumbRow.thumbnail.indexOf("O-4AAOSwjqRmSDcD") !== -1, true, "thumbnail col");
+assertEqual(OPShelf.imageCandidates(thumbRow)[0], thumbRow.thumbnail, "sheet thumb first");
+assertEqual(OPShelf.groupRows([{ "Card number": "st01-007", Thumbnail: "not a url" }])[0].thumbnail, "", "ignore non url");
+
+const gvizThumb = OPShelf.rowsFromGviz(OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Thumbnail"}],"rows":[{"c":[{"v":"p-022"},{"v":null,"f":"=IMAGE(\\"https://i.ebayimg.com/images/g/abc/s-l960.webp\\")"}]}]}});'));
+assertEqual(gvizThumb[0].Thumbnail.indexOf("https://") === 0 || gvizThumb[0].Thumbnail.indexOf("IMAGE") !== -1, true, "gviz image formula");
+assertEqual(OPShelf.groupRows(gvizThumb)[0].thumbnail.indexOf("https://i.ebayimg.com") === 0, true, "url from image formula");
+
 const gviz = OPShelf.parseGvizText('/*O_o*/\ncb({"status":"ok","table":{"cols":[{"id":"A","label":"Card number"},{"id":"B","label":"Rarity"}],"rows":[{"c":[{"v":"op13-004"},{"v":"l"}]}]}});');
 assertDeepEqual(OPShelf.rowsFromGviz(gviz), [{ "Card number": "op13-004", Rarity: "l" }], "gviz rows");
 
