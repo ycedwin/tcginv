@@ -154,11 +154,19 @@ assertEqual(
   "pkm promo hareruya"
 );
 assertEqual(
-  PkmShelf.imageCandidates({ set: "OldBack", localId: "067", number: "#067", thumbnail: "" }).some(function (url) {
-    return /op00-2-7948918/.test(url);
+  PkmShelf.imageCandidates({ set: "M3", localId: "021", number: "021/080", thumbnail: "" }).some(function (url) {
+    return /product-images\.tcgplayer\.com\/fit-in\/437x437\/674340/.test(url);
   }),
   true,
-  "pkm old back hareruya"
+  "pkm tcgplayer m3"
+);
+assertEqual(
+  PkmShelf.pickTcgplayerId(
+    [{ productId: 1, setCode: "M2", customAttributes: { number: "058/080" } }],
+    { set: "M2", number: "058/080" }
+  ),
+  1,
+  "pkm tcgplayer pick"
 );
 assertEqual(
   PkmShelf.groupRows([{ Set: "old back", "Card number": "#067" }])[0].id,

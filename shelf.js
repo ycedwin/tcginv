@@ -339,6 +339,21 @@ const PkmShelf = (() => {
     "oldback|067": "products/op00-2-7948918.jpg",
     "l1|031/070": "products/r031070l1-l-2-1098972.jpg",
   };
+  const TCGPLAYER_IMG = "https://product-images.tcgplayer.com/fit-in/437x437";
+  // ponytail: TCGplayer product IDs are not derived from set+number, so this map is search-resolved.
+  const TCGPLAYER = {
+    "m1l|001/063": 647110,
+    "m1l|002/063": 647111,
+    "m2|058/080": 655837,
+    "m2a|044/193": 665715,
+    "m2a|112/193": 665783,
+    "m2a|126/193": 665797,
+    "m2a|199/193": 665870,
+    "m3|021/080": 674340,
+    "m3|086/080": 674405,
+    "m5|029/081": 695013,
+    "mc|441/742": 669386,
+  };
 
   function canonicalSet(raw) {
     const text = String(raw || "").trim();
@@ -430,7 +445,62 @@ const PkmShelf = (() => {
       urls.push(HARERUYA_CDN + hareruyaPath);
       urls.push(`https://wsrv.nl/?url=${encodeURIComponent("www.hareruya2.com/cdn/shop/" + hareruyaPath)}`);
     }
+    const tcgId = TCGPLAYER[`${String(card.set).toLowerCase()}|${String(card.number).toLowerCase()}`]
+      || TCGPLAYER[`${String(card.set).toLowerCase()}|${String(card.raw).toLowerCase()}`];
+    if (tcgId) {
+      urls.push(`${TCGPLAYER_IMG}/${tcgId}.jpg`);
+      urls.push(`https://tcgplayer-cdn.tcgplayer.com/product/${tcgId}_in_1000x1000.jpg`);
+    }
     return [...new Set(urls)];
+  }
+
+  function normCollector(value) {
+    const text = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+    const split = text.match(/^0*(\d+)\/(.+)$/);
+    if (split) return `${split[1].padStart(3, "0")}/${split[2]}`;
+    const dex = text.match(/^#?0*(\d+)$/);
+    if (dex) return dex[1].padStart(3, "0");
+    return text;
+  }
+
+  function pickTcgplayerId(items, card) {
+    const wantSet = String(card.set || "").toUpperCase().replace(/-/g, "");
+    const wantNum = normCollector(card.number) || normCollector(card.raw);
+    let loose = 0;
+    for (let i = 0; i < (items || []).length; i += 1) {
+      const item = items[i];
+      const pid = Number(item.productId) || 0;
+      if (!pid) continue;
+      const code = String(item.setCode || "").toUpperCase().replace(/-/g, "");
+      const num = normCollector((item.customAttributes || {}).number);
+      if (num === wantNum && (code === wantSet || code.indexOf(wantSet) !== -1 || wantSet.indexOf(code) !== -1)) return pid;
+      if (!loose && num === wantNum) loose = pid;
+    }
+    return loose;
+  }
+
+  function lookupTcgplayer(card) {
+    if (typeof fetch !== "function") return Promise.resolve("");
+    const q = encodeURIComponent(`${card.set} ${String(card.number || "").replace(/^#/, "")}`);
+    const body = {
+      algorithm: "sales_exp_fields_boosting",
+      from: 0,
+      size: 8,
+      filters: { term: { productLineName: ["pokemon-japan"] }, range: {}, match: {} },
+      listingSearch: { context: { cart: {} }, filters: { term: { sellerStatus: "Live", channelId: 0 } } },
+      context: { cart: {}, shippingCountry: "US" },
+      settings: { useFuzzySearch: true, didYouMean: {} },
+      sort: {},
+    };
+    return fetch(`https://mp-search-api.tcgplayer.com/v1/search/request?q=${q}`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then((response) => (response.ok ? response.json() : null)).then((data) => {
+      const items = data && data.results && data.results[0] && data.results[0].results;
+      const pid = pickTcgplayerId(items, card);
+      return pid ? `${TCGPLAYER_IMG}/${pid}.jpg` : "";
+    }).catch(() => "");
   }
 
   function groupRows(rows) {
@@ -490,6 +560,8 @@ const PkmShelf = (() => {
     parseCollector,
     rarityLabel,
     imageCandidates,
+    lookupTcgplayer,
+    pickTcgplayerId,
     groupRows,
     parseCondition: OPShelf.parseCondition,
     parseSold: OPShelf.parseSold,

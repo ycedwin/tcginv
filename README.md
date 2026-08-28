@@ -37,7 +37,7 @@ Same spreadsheet, tab **PKM**. Page: [pkm.html](https://ycedwin.github.io/tcginv
 | Sold | empty = in stock. A number = sold price in HKD (shown as HK$) |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` |
 
-Images come from [TCGdex](https://tcgdex.dev) JP art. If that file is missing, a few odd sets fall back to [Hareruya2](https://www.hareruya2.com/). Override anything with `thumbs/pkm/SV3-066.jpg`.
+Images come from [TCGdex](https://tcgdex.dev) JP art. If that file is missing, odd sets fall back to [Hareruya2](https://www.hareruya2.com/) or [TCGplayer Japan](https://www.tcgplayer.com/categories/trading-and-collectible-card-games/pokemon-japan). Override anything with `thumbs/pkm/SV3-066.jpg`.
 
 Newest sheet rows show first. The sort button cycles newest-first → card number A–Z → Z–A.
 

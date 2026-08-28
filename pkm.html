@@ -573,7 +573,7 @@
     <p>Personal inventory. Card art from TCGdex and Pokémon Card Game official images. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
   </footer>
 
-  <script src="shelf.js?v=10"></script>
+  <script src="shelf.js?v=11"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -692,16 +692,32 @@
       const known = knownThumb(card);
       const list = known ? [known, ...urls.filter((url) => url !== known)] : urls;
       let index = 0;
+      let tcgTried = false;
+      const showPlaceholder = () => {
+        if (!image.isConnected) return;
+        const placeholder = document.createElement("div");
+        placeholder.className = "image-placeholder";
+        placeholder.textContent = "Picture not found";
+        image.replaceWith(placeholder);
+      };
       image.addEventListener("error", () => {
         index += 1;
         if (index < list.length) {
           image.src = list[index];
           return;
         }
-        const placeholder = document.createElement("div");
-        placeholder.className = "image-placeholder";
-        placeholder.textContent = "Picture not found";
-        image.replaceWith(placeholder);
+        if (tcgTried) {
+          showPlaceholder();
+          return;
+        }
+        tcgTried = true;
+        PkmShelf.lookupTcgplayer(card).then((url) => {
+          if (url) {
+            image.src = url;
+            return;
+          }
+          showPlaceholder();
+        });
       });
       image.addEventListener("load", () => {
         if (image.naturalWidth) rememberThumb(card, image.currentSrc || image.src);
