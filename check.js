@@ -21,6 +21,9 @@ assertEqual(OPShelf.parseParallel("jolly roger, y").label, "Jolly Roger · Alt",
 assertEqual(OPShelf.parseParallel("jolly roger, y").jollyRoger, true, "jr flag");
 assertEqual(OPShelf.parseParallel("jolly roger, y").parallel, true, "parallel flag");
 
+assertEqual(OPShelf.parseParallel("sp").label, "SP", "sp label");
+assertEqual(OPShelf.parseParallel("sp").parallel, true, "sp is parallel");
+
 const grouped = OPShelf.groupRows([
   { "Card number": "op14-014", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
   { "Card number": "op14-014", Rarity: "r", Alternate: "", Cost: 0, "Thumbnail url": "" },
@@ -126,6 +129,16 @@ assertEqual(
   true,
   "p-022 ebay before limitless"
 );
+
+const enelSp = OPShelf.imageCandidates({ id: "OP05-100", set: "OP05", alternate: "SP", parallel: true, jollyRoger: false, thumbnail: "" });
+assertEqual(enelSp.some(function (url) { return /OP05-100_p2_JP/.test(url); }), true, "op05-100 sp p2");
+assertEqual(
+  enelSp.findIndex(function (url) { return /_p2_JP/.test(url); })
+    < enelSp.findIndex(function (url) { return /_p1_JP/.test(url); }),
+  true,
+  "op05-100 sp p2 before p1"
+);
+assertEqual(OPShelf.groupRows([{ "Card number": "op05-100", Rarity: "sr", Parallel: "sp", "Cost(Yen)": 5000 }])[0].cost, 5000, "cost yen col");
 
 assertEqual(PkmShelf.canonicalSet("sv3"), "SV3", "pkm set sv3");
 assertEqual(PkmShelf.canonicalSet("s10b"), "S10b", "pkm set s10b");

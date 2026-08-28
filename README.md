@@ -16,7 +16,7 @@ Personal One Piece and Pokémon shelves. Edit stock in Google Sheets; the site r
 | --- | --- |
 | Card number | `op13-004` — set is already in the id |
 | Rarity | `l` / `sr` / `r` / `uc` / `c` / `p` |
-| Parallel | blank = normal. `y` = Alt art. `jolly roger` = JR foil from [CardRush](https://www.cardrush-op.jp/product/) |
+| Parallel | blank = normal. `y` = Alt art. `sp` = SP art. `jolly roger` = JR foil from [CardRush](https://www.cardrush-op.jp/product/) |
 | Cost | what you paid. Empty or `0` shows as — |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` shows on the image (bottom left) |
 | Sold | empty = in stock. A number = sold at that price |

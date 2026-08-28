@@ -53,11 +53,13 @@ const OPShelf = (() => {
     if (!text) return { label: "", parallel: false, jollyRoger: false };
     const lower = text.toLowerCase();
     const jollyRoger = /jolly\s*roger|\bjr\b/.test(lower);
-    const rest = lower.replace(/jolly\s*roger/g, " ").replace(/\bjr\b/g, " ");
+    const special = /(^|\b)sp\b/.test(lower);
+    const rest = lower.replace(/jolly\s*roger/g, " ").replace(/\bjr\b/g, " ").replace(/(^|\b)sp\b/g, " ");
     const parallel = /^(y|yes|true|1|x|✓|✔|p|alt|parallel)$/i.test(text)
       || /\b(y|yes|true|parallel|alt)\b/.test(rest);
     if (jollyRoger && parallel) return { label: "Jolly Roger · Alt", parallel: true, jollyRoger: true };
     if (jollyRoger) return { label: "Jolly Roger", parallel: false, jollyRoger: true };
+    if (special) return { label: "SP", parallel: true, jollyRoger: false };
     if (parallel) return { label: "Alt", parallel: true, jollyRoger: false };
     return { label: text, parallel: true, jollyRoger: false };
   }
@@ -75,10 +77,15 @@ const OPShelf = (() => {
     if (card.thumbnail) urls.push(card.thumbnail);
     urls.push(`thumbs/${card.id}.webp`, `thumbs/${card.id}.png`, `thumbs/${card.id}.jpg`);
     const jr = card.jollyRoger || /jolly\s*roger|\bjr\b/i.test(card.alternate || "");
+    const sp = /\bsp\b/i.test(card.alternate || "");
     const para = card.parallel || (!!card.alternate && !jr);
     if (jr && JR_THUMBS[card.id]) urls.push(JR_THUMBS[card.id]);
     if (ART_OVERRIDE[card.id]) urls.push(ART_OVERRIDE[card.id]);
     const base = `${IMAGE_CDN}/${card.set}/${card.id}`;
+    if (sp) {
+      urls.push(`${base}_p2_JP.webp`);
+      urls.push(`https://wsrv.nl/?url=${encodeURIComponent(`www.onepiece-cardgame.com/images/cardlist/card/${card.id}_p2.png`)}`);
+    }
     if (para) urls.push(`${base}_p1_JP.webp`);
     urls.push(`${base}_JP.webp`);
     if (!ART_OVERRIDE[card.id]) urls.push(officialArt(card.id));
@@ -167,7 +174,7 @@ const OPShelf = (() => {
       const alternate = parsed.label;
       const condition = parseCondition(pick(row, "Condition", "Cond", "状態"));
       const thumbnail = pickThumbnail(row);
-      const cost = parseNumber(pick(row, "Cost")) || 0;
+      const cost = parseNumber(pick(row, "Cost", "Cost(Yen)", "Cost (Yen)")) || 0;
       const soldInfo = parseSold(pickSold(row));
       const key = [id, rarity.toLowerCase(), alternate.toLowerCase(), condition, cost, soldInfo.sold ? (soldInfo.price ?? "sold") : "open"].join("|");
       const existing = map.get(key);
