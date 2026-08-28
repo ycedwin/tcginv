@@ -515,42 +515,6 @@ const PkmShelf = (() => {
     return loose;
   }
 
-  function pricechartingCover(text) {
-    const match = String(text || "").match(/https:\/\/storage\.googleapis\.com\/images\.pricecharting\.com\/[a-f0-9]{64}\/\d+\.jpg/);
-    return match ? match[0].replace(/\/\d+\.jpg$/, "/1600.jpg") : "";
-  }
-
-  function pickPricechartingPath(text, card) {
-    const num = String(Number(card.localId) || 0);
-    if (!num || num === "0") return "";
-    const setHint = String(card.set || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-    const re = /\/game\/(pokemon-japanese-[a-z0-9-]+)\/([a-z0-9-]+)-(\d+)/gi;
-    let loose = "";
-    let match;
-    while ((match = re.exec(text))) {
-      if (match[3] !== num) continue;
-      const path = `/game/${match[1]}/${match[2]}-${match[3]}`;
-      const slug = match[1].replace(/-/g, "");
-      if (setHint && slug.indexOf(setHint) !== -1) return path;
-      if (!loose) loose = path;
-    }
-    return loose;
-  }
-
-  function lookupPricecharting(card) {
-    if (typeof fetch !== "function") return Promise.resolve("");
-    const q = encodeURIComponent(`japanese ${card.set} ${String(card.number || "").replace(/^#/, "")}`);
-    // ponytail: PriceCharting HTML is Cloudflare-blocked; jina is a CORS-readable mirror. Ceiling: ~20 req/min.
-    const search = `https://r.jina.ai/https://www.pricecharting.com/search-products?q=${q}&type=prices`;
-    return fetch(search).then((response) => (response.ok ? response.text() : "")).then((text) => {
-      const direct = pricechartingCover(text);
-      if (direct) return direct;
-      const path = pickPricechartingPath(text, card);
-      if (!path) return "";
-      return fetch(`https://r.jina.ai/https://www.pricecharting.com${path}`).then((response) => (response.ok ? response.text() : "")).then(pricechartingCover);
-    }).catch(() => "");
-  }
-
   function lookupTcgplayer(card) {
     if (typeof fetch !== "function") return Promise.resolve("");
     const q = encodeURIComponent(`${card.set} ${String(card.number || "").replace(/^#/, "")}`);
@@ -633,8 +597,6 @@ const PkmShelf = (() => {
     rarityLabel,
     imageCandidates,
     lookupTcgplayer,
-    lookupPricecharting,
-    pickPricechartingPath,
     pickTcgplayerId,
     groupRows,
     parseCondition: OPShelf.parseCondition,

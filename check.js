@@ -196,11 +196,6 @@ assertEqual(
   assertEqual(official === -1, true, "pkm smh has no official");
 })();
 assertEqual(
-  PkmShelf.pickPricechartingPath("/game/pokemon-japanese-ruler-of-the-black-flame/charizard-ex-66", { set: "SV3", localId: "066" }),
-  "/game/pokemon-japanese-ruler-of-the-black-flame/charizard-ex-66",
-  "pkm pricecharting path"
-);
-assertEqual(
   PkmShelf.imageCandidates({ set: "SV-P", localId: "291", number: "291/SV-P", thumbnail: "" }).some(function (url) {
     return /promo291sv-psv-p/.test(url);
   }),

@@ -37,7 +37,7 @@ Same spreadsheet, tab **PKM**. Page: [pkm.html](https://ycedwin.github.io/tcginv
 | Sold | empty = in stock. A number = sold price in HKD (shown as HK$) |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` |
 
-Images: official Pokémon Card → [Hareruya2](https://www.hareruya2.com/) → [PriceCharting](https://www.pricecharting.com/category/pokemon-cards) → [TCGplayer Japan](https://www.tcgplayer.com/categories/trading-and-collectible-card-games/pokemon-japan). TCGdex fills common JP files after Hareruya. Override with `thumbs/pkm/SV3-066.jpg`.
+Images: official Pokémon Card → [Hareruya2](https://www.hareruya2.com/) → [TCGplayer Japan](https://www.tcgplayer.com/categories/trading-and-collectible-card-games/pokemon-japan). TCGdex fills common JP files after Hareruya. Override with `thumbs/pkm/SV3-066.jpg`.
 
 Newest sheet rows show first. The sort button cycles newest-first → card number A–Z → Z–A.
 
