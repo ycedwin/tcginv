@@ -570,10 +570,10 @@
 
   <footer>
     <p id="footer-meta">Catalog updating…</p>
-    <p>Personal inventory. Card art from Pokémon Card Game official images and PriceCharting JP. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
+    <p>Personal inventory. Card art from TCGdex and Pokémon Card Game official images. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
   </footer>
 
-  <script src="shelf.js?v=13"></script>
+  <script src="shelf.js?v=12"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -591,7 +591,7 @@
     let sortDir = "asc";
     let sortMode = "added";
     // ponytail: bump THUMB_VER when thumbnails need a refresh.
-    const THUMB_VER = "2";
+    const THUMB_VER = "1";
     const THUMB_STORE = "tcginv-pkm-thumbs-" + THUMB_VER;
     const thumbMem = new Map();
 
@@ -693,6 +693,7 @@
       const list = known ? [known, ...urls.filter((url) => url !== known)] : urls;
       let index = 0;
       let pcTried = false;
+      let tcgTried = false;
       const showPlaceholder = () => {
         if (!image.isConnected) return;
         const placeholder = document.createElement("div");
@@ -709,6 +710,14 @@
         if (!pcTried) {
           pcTried = true;
           PkmShelf.lookupPricecharting(card).then((url) => {
+            if (url) image.src = url;
+            else image.dispatchEvent(new Event("error"));
+          });
+          return;
+        }
+        if (!tcgTried) {
+          tcgTried = true;
+          PkmShelf.lookupTcgplayer(card).then((url) => {
             if (url) image.src = url;
             else image.dispatchEvent(new Event("error"));
           });
