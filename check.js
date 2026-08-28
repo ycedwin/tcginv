@@ -146,6 +146,21 @@ assertEqual(
   true,
   "pkm smh hareruya"
 );
+(function () {
+  const urls = PkmShelf.imageCandidates({ set: "SMH", localId: "032", number: "032/131", thumbnail: "" });
+  const official = urls.findIndex(function (url) { return /pokemon-card\.com/.test(url); });
+  const hareruya = urls.findIndex(function (url) { return /hareruya2/.test(url); });
+  const tcgdex = urls.findIndex(function (url) { return /tcgdex\.net/.test(url); });
+  const tcgplayer = urls.findIndex(function (url) { return /tcgplayer/.test(url); });
+  assertEqual(hareruya !== -1 && tcgdex !== -1 && hareruya < tcgdex, true, "pkm hareruya before tcgdex");
+  assertEqual(tcgplayer === -1 || tcgdex < tcgplayer, true, "pkm tcgdex before tcgplayer");
+  assertEqual(official === -1, true, "pkm smh has no official");
+})();
+assertEqual(
+  PkmShelf.pickPricechartingPath("/game/pokemon-japanese-ruler-of-the-black-flame/charizard-ex-66", { set: "SV3", localId: "066" }),
+  "/game/pokemon-japanese-ruler-of-the-black-flame/charizard-ex-66",
+  "pkm pricecharting path"
+);
 assertEqual(
   PkmShelf.imageCandidates({ set: "SV-P", localId: "291", number: "291/SV-P", thumbnail: "" }).some(function (url) {
     return /promo291sv-psv-p/.test(url);

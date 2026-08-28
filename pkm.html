@@ -573,7 +573,7 @@
     <p>Personal inventory. Card art from TCGdex and Pokémon Card Game official images. Drop your own photos in thumbs/pkm/ to replace them. Not affiliated with Nintendo, The Pokémon Company, or Creatures.</p>
   </footer>
 
-  <script src="shelf.js?v=11"></script>
+  <script src="shelf.js?v=12"></script>
   <script>
     const catalog = document.querySelector("#catalog");
     const search = document.querySelector("#search");
@@ -692,6 +692,7 @@
       const known = knownThumb(card);
       const list = known ? [known, ...urls.filter((url) => url !== known)] : urls;
       let index = 0;
+      let pcTried = false;
       let tcgTried = false;
       const showPlaceholder = () => {
         if (!image.isConnected) return;
@@ -706,18 +707,23 @@
           image.src = list[index];
           return;
         }
-        if (tcgTried) {
-          showPlaceholder();
+        if (!pcTried) {
+          pcTried = true;
+          PkmShelf.lookupPricecharting(card).then((url) => {
+            if (url) image.src = url;
+            else image.dispatchEvent(new Event("error"));
+          });
           return;
         }
-        tcgTried = true;
-        PkmShelf.lookupTcgplayer(card).then((url) => {
-          if (url) {
-            image.src = url;
-            return;
-          }
-          showPlaceholder();
-        });
+        if (!tcgTried) {
+          tcgTried = true;
+          PkmShelf.lookupTcgplayer(card).then((url) => {
+            if (url) image.src = url;
+            else image.dispatchEvent(new Event("error"));
+          });
+          return;
+        }
+        showPlaceholder();
       });
       image.addEventListener("load", () => {
         if (image.naturalWidth) rememberThumb(card, image.currentSrc || image.src);
