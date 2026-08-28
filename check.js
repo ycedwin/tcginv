@@ -180,47 +180,22 @@ assertEqual(
 );
 assertEqual(
   PkmShelf.imageCandidates({ set: "SMH", localId: "032", number: "032/131", thumbnail: "" }).some(function (url) {
-    return /hareruya2\.com\/cdn\/shop\/products\/d032131smh/.test(url);
+    return /hareruya2|tcgdex|tcgplayer/.test(url);
   }),
-  true,
-  "pkm smh hareruya"
+  false,
+  "pkm no hareruya tcgdex tcgplayer"
 );
-(function () {
-  const urls = PkmShelf.imageCandidates({ set: "SMH", localId: "032", number: "032/131", thumbnail: "" });
-  const official = urls.findIndex(function (url) { return /pokemon-card\.com/.test(url); });
-  const hareruya = urls.findIndex(function (url) { return /hareruya2/.test(url); });
-  const tcgdex = urls.findIndex(function (url) { return /tcgdex\.net/.test(url); });
-  const tcgplayer = urls.findIndex(function (url) { return /tcgplayer/.test(url); });
-  assertEqual(hareruya !== -1 && tcgdex !== -1 && hareruya < tcgdex, true, "pkm hareruya before tcgdex");
-  assertEqual(tcgplayer === -1 || tcgdex < tcgplayer, true, "pkm tcgdex before tcgplayer");
-  assertEqual(official === -1, true, "pkm smh has no official");
-})();
+assertEqual(
+  PkmShelf.imageCandidates({ set: "SMH", localId: "032", number: "032/131", thumbnail: "" }).some(function (url) {
+    return /pokemon-card\.com/.test(url);
+  }),
+  false,
+  "pkm smh has no official"
+);
 assertEqual(
   PkmShelf.pickPricechartingPath("/game/pokemon-japanese-ruler-of-the-black-flame/charizard-ex-66", { set: "SV3", localId: "066" }),
   "/game/pokemon-japanese-ruler-of-the-black-flame/charizard-ex-66",
   "pkm pricecharting path"
-);
-assertEqual(
-  PkmShelf.imageCandidates({ set: "SV-P", localId: "291", number: "291/SV-P", thumbnail: "" }).some(function (url) {
-    return /promo291sv-psv-p/.test(url);
-  }),
-  true,
-  "pkm promo hareruya"
-);
-assertEqual(
-  PkmShelf.imageCandidates({ set: "M3", localId: "021", number: "021/080", thumbnail: "" }).some(function (url) {
-    return /product-images\.tcgplayer\.com\/fit-in\/437x437\/674340/.test(url);
-  }),
-  true,
-  "pkm tcgplayer m3"
-);
-assertEqual(
-  PkmShelf.pickTcgplayerId(
-    [{ productId: 1, setCode: "M2", customAttributes: { number: "058/080" } }],
-    { set: "M2", number: "058/080" }
-  ),
-  1,
-  "pkm tcgplayer pick"
 );
 assertEqual(
   PkmShelf.groupRows([{ Set: "old back", "Card number": "#067" }])[0].id,
@@ -231,13 +206,6 @@ assertEqual(
   PkmShelf.groupRows([{ Set: "SoulSilver Collection", "Card number": "031/070", Rarity: "R" }])[0].id,
   "L1 031/070",
   "pkm soulsilver id"
-);
-assertEqual(
-  PkmShelf.imageCandidates({ set: "L1", localId: "031", number: "031/070", thumbnail: "" }).some(function (url) {
-    return /r031070l1-l-2-1098972/.test(url);
-  }),
-  true,
-  "pkm soulsilver hareruya"
 );
 
 const thumbRow = OPShelf.groupRows([
