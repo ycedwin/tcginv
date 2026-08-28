@@ -17,9 +17,9 @@ Personal One Piece and Pokémon shelves. Edit stock in Google Sheets; the site r
 | Card number | `op13-004` — set is already in the id |
 | Rarity | `l` / `sr` / `r` / `uc` / `c` / `p` |
 | Parallel | blank = normal. `y` = Alt art. `sp` = SP art. `jolly roger` = JR foil from [CardRush](https://www.cardrush-op.jp/product/) |
-| Cost | what you paid. Empty or `0` shows as — |
+| Cost / Cost(Yen) | yen in the sheet. Shown as HKD at ¥1 = HK$0.05 |
 | Condition | blank = no tag. `A` / `B` / `C` / `D` shows on the image (bottom left) |
-| Sold | empty = in stock. A number = sold at that price |
+| Sold | empty = in stock. A number = sold price in HKD (shown as HK$) |
 | Thumbnail / Thumbnail url | optional `https://…` URL. Used first when present |
 
 Each row is one copy. Same card + same cost + same sold price + same condition stacks as qty. Different cost, sold price, or condition stays a separate lot.

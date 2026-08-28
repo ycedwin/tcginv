@@ -741,8 +741,8 @@
       const prices = document.createElement("div");
       prices.className = "prices";
       for (const [label, value] of [
-        ["Cost", OPShelf.formatPrice(card.cost)],
-        ["Sold", card.sold ? OPShelf.formatPrice(card.soldPrice) : "—"],
+        ["Cost", OPShelf.formatHkdFromYen(card.cost)],
+        ["Sold", card.sold ? OPShelf.formatHkd(card.soldPrice) : "—"],
       ]) {
         const box = document.createElement("div");
         box.className = "price-box";

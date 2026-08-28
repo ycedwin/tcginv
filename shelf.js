@@ -134,7 +134,7 @@ const OPShelf = (() => {
     return text === "—" ? "—" : "HK$" + text;
   }
 
-  // ponytail: sheet stays yen; 1 JPY = 0.05 HKD on the PKM page only.
+  // ponytail: sheet stays yen; 1 JPY = 0.05 HKD on the page.
   function formatHkdFromYen(value) {
     if (value == null || value === "") return "—";
     const yen = Number(value);
